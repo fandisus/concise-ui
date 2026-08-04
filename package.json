@@ -1,22 +1,48 @@
 {
-  "name": "concise-ui",
+  "name": "@icfm/concise-ui",
   "version": "0.0.0",
-  "private": true,
+  "description": "A concise Vue 3 UI component library.",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/concise-ui.umd.cjs",
+  "module": "./dist/concise-ui.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/concise-ui.js",
+      "require": "./dist/concise-ui.umd.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "keywords": [
+    "vue",
+    "vue3",
+    "ui",
+    "components",
+    "component-library"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "run-s type-check build-only build:types",
+    "prepublishOnly": "npm run build",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
+    "build:types": "vue-tsc -p tsconfig.lib.json",
     "type-check": "vue-tsc --build",
     "lint": "run-s \"lint:*\"",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/"
-  },
-  "dependencies": {
-    "vue": "^3.5.40"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
@@ -40,8 +66,12 @@
     "vite": "^8.1.5",
     "vite-plugin-vue-devtools": "^8.1.5",
     "vitest": "^4.1.10",
+    "vue": "^3.5.40",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.7"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"
