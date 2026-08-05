@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, toRaw, useId, watch } from 'vue'
 
 import CButton from '../button/CButton.vue'
 import type { CFormControlSize } from '../form/types'
@@ -96,6 +96,15 @@ function objectKey(value: object) {
 
 function valuesMatch(left: CSelectValue, right: CSelectValue) {
   if (Object.is(left, right)) return true
+  if (
+    typeof left === 'object' &&
+    left !== null &&
+    typeof right === 'object' &&
+    right !== null &&
+    Object.is(toRaw(left), toRaw(right))
+  ) {
+    return true
+  }
   if (
     props.optionValue ||
     !props.optionKey ||

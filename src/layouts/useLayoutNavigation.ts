@@ -113,6 +113,13 @@ export function useTopNavigation() {
           active: route.name === 'multi-select',
           command: () => void router.push({ name: 'multi-select' }),
         },
+        {
+          id: 'auto-complete',
+          label: 'Auto Complete',
+          icon: '⌕',
+          active: route.name === 'auto-complete',
+          command: () => void router.push({ name: 'auto-complete' }),
+        },
         { type: 'separator' },
         {
           id: 'icon',
@@ -229,6 +236,13 @@ export function useComponentNavigation() {
       icon: '☷',
       active: route.name === 'multi-select',
       command: () => void router.push({ name: 'multi-select' }),
+    },
+    {
+      id: 'auto-complete',
+      label: 'Auto Complete',
+      icon: '⌕',
+      active: route.name === 'auto-complete',
+      command: () => void router.push({ name: 'auto-complete' }),
     },
     { type: 'separator' },
     {

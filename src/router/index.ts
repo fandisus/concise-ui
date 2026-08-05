@@ -92,6 +92,11 @@ const router = createRouter({
           component: () => import('@/pages/components/MultiSelect.vue'),
         },
         {
+          path: 'auto-complete',
+          name: 'auto-complete',
+          component: () => import('@/pages/components/AutoComplete.vue'),
+        },
+        {
           path: 'icon',
           name: 'icon',
           component: () => import('@/pages/components/Icon.vue'),

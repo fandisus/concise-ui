@@ -1,4 +1,5 @@
 export { default as CAppBar } from './components/app-bar/CAppBar.vue'
+export { default as CAutoComplete } from './components/auto-complete/CAutoComplete.vue'
 export { default as CButton } from './components/button/CButton.vue'
 export { default as CCheckbox } from './components/checkbox/CCheckbox.vue'
 export { default as CFormField } from './components/form-field/CFormField.vue'

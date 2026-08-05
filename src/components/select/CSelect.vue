@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, toRaw, useId, watch } from 'vue'
 
 import CButton from '../button/CButton.vue'
 import type { CFormControlSize } from '../form/types'
 import { useFormControl } from '../form/useFormControl'
+import CIcon from '../icon/CIcon.vue'
 import type {
   CSelectKeyAccessor,
   CSelectLabelAccessor,
@@ -24,6 +25,9 @@ const props = withDefaults(
     placeholder?: string
     clearable?: boolean
     filterable?: boolean
+    debounceWait?: number
+    loading?: boolean
+    minSearchLength?: number
     size?: CFormControlSize
     disabled?: boolean
     required?: boolean
@@ -38,6 +42,9 @@ const props = withDefaults(
     placeholder: undefined,
     clearable: false,
     filterable: false,
+    debounceWait: 300,
+    loading: false,
+    minSearchLength: 0,
     size: 'medium',
     disabled: false,
     required: false,
@@ -47,6 +54,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'update:modelValue': [value: CSelectValue | null]
+  search: [query: string]
   clear: []
 }>()
 
@@ -59,6 +67,9 @@ const isOpen = ref(false)
 const isFiltering = ref(false)
 const query = ref('')
 const highlightedKey = ref<string | number | null>(null)
+const cachedSelection = ref<{ value: CSelectValue; label: string } | null>(null)
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+let lastSearchQuery: string | undefined
 let nextObjectKey = 0
 
 const selection = computed({
@@ -100,6 +111,15 @@ function objectKey(value: object) {
 
 function valuesMatch(left: CSelectValue | null, right: CSelectValue | null) {
   if (Object.is(left, right)) return true
+  if (
+    typeof left === 'object' &&
+    left !== null &&
+    typeof right === 'object' &&
+    right !== null &&
+    Object.is(toRaw(left), toRaw(right))
+  ) {
+    return true
+  }
   if (
     props.optionValue ||
     !props.optionKey ||
@@ -166,7 +186,19 @@ const visibleOptions = computed(() =>
 const selectedOption = computed(() =>
   visibleOptions.value.find((option) => valuesMatch(option.value, selection.value)),
 )
-const selectedLabel = computed(() => selectedOption.value?.label ?? '')
+const selectedLabel = computed(() => {
+  const value = selection.value
+  if (value === null) return ''
+  if (selectedOption.value) return selectedOption.value.label
+  if (!props.optionValue && typeof value === 'object') {
+    const label = resolveLabel(value, props.optionLabel)
+    if (label) return label
+  }
+  if (cachedSelection.value && valuesMatch(cachedSelection.value.value, value)) {
+    return cachedSelection.value.label
+  }
+  return ''
+})
 const filterText = computed(() => (isFiltering.value ? query.value.trim() : ''))
 const filteredOptions = computed(() => {
   const search = filterText.value.toLocaleLowerCase()
@@ -177,14 +209,28 @@ const filteredOptions = computed(() => {
 const highlightedIndex = computed(() =>
   filteredOptions.value.findIndex((option) => option.key === highlightedKey.value),
 )
+const searchTooShort = computed(
+  () =>
+    (isFiltering.value || selection.value === null) &&
+    query.value.trim().length < Math.max(0, props.minSearchLength),
+)
 const activeDescendant = computed(() =>
-  highlightedIndex.value >= 0 ? `${listboxId}-option-${highlightedIndex.value}` : undefined,
+  !props.loading && !searchTooShort.value && highlightedIndex.value >= 0
+    ? `${listboxId}-option-${highlightedIndex.value}`
+    : undefined,
 )
 
 watch(
-  selectedLabel,
-  (label) => {
-    if (!isOpen.value) query.value = label
+  [selection, selectedOption],
+  ([value, option]) => {
+    if (value === null) cachedSelection.value = null
+    else if (option) cachedSelection.value = { value, label: option.label }
+    else if (!props.optionValue && typeof value === 'object') {
+      const label = resolveLabel(value, props.optionLabel)
+      if (label) cachedSelection.value = { value, label }
+    }
+
+    if (!isOpen.value) query.value = selectedLabel.value
   },
   { immediate: true },
 )
@@ -192,11 +238,21 @@ watch(
 watch(filteredOptions, () => {
   if (
     isOpen.value &&
+    !props.loading &&
+    !searchTooShort.value &&
     (highlightedIndex.value < 0 || filteredOptions.value[highlightedIndex.value]?.disabled)
   ) {
     highlightFirstEnabled()
   }
 })
+
+watch(
+  () => props.loading,
+  (loading) => {
+    if (loading) highlightedKey.value = null
+    else if (isOpen.value && !searchTooShort.value) highlightFirstEnabled()
+  },
+)
 
 watch(highlightedIndex, (index) => {
   if (index < 0) return
@@ -224,15 +280,54 @@ function highlightFirstEnabled() {
   highlightedKey.value = filteredOptions.value.find((option) => !option.disabled)?.key ?? null
 }
 
+function emitSearch(queryValue: string) {
+  lastSearchQuery = queryValue
+  emit('search', queryValue)
+}
+
+function cancelScheduledSearch() {
+  if (searchTimer !== undefined) clearTimeout(searchTimer)
+  searchTimer = undefined
+}
+
+function scheduleSearch(value: string) {
+  cancelScheduledSearch()
+  const search = value.trim()
+
+  if (search.length < Math.max(0, props.minSearchLength)) {
+    if (lastSearchQuery !== '') emitSearch('')
+    return
+  }
+  if (!search) {
+    emitSearch('')
+    return
+  }
+
+  const wait = Math.max(0, props.debounceWait)
+  if (!wait) emitSearch(search)
+  else {
+    searchTimer = setTimeout(() => {
+      searchTimer = undefined
+      emitSearch(search)
+    }, wait)
+  }
+}
+
 function openList() {
   if (props.disabled) return
   isOpen.value = true
   const selected = selectedOption.value
-  highlightedKey.value = selected && !selected.disabled ? selected.key : null
-  if (highlightedKey.value === null) highlightFirstEnabled()
+  highlightedKey.value =
+    !props.loading && !searchTooShort.value && selected && !selected.disabled
+      ? selected.key
+      : null
+  if (highlightedKey.value === null && !props.loading && !searchTooShort.value) {
+    highlightFirstEnabled()
+  }
 }
 
 function closeList(restoreLabel = true) {
+  cancelScheduledSearch()
   isOpen.value = false
   isFiltering.value = false
   highlightedKey.value = null
@@ -253,8 +348,12 @@ function handleClick(event: MouseEvent) {
 function handleInput(event: Event) {
   query.value = (event.target as HTMLInputElement).value
   isFiltering.value = true
+  scheduleSearch(query.value)
   isOpen.value = true
-  nextTick(highlightFirstEnabled)
+  nextTick(() => {
+    if (!props.loading && !searchTooShort.value) highlightFirstEnabled()
+    else highlightedKey.value = null
+  })
 }
 
 function moveHighlight(direction: 1 | -1) {
@@ -262,6 +361,7 @@ function moveHighlight(direction: 1 | -1) {
     openList()
     return
   }
+  if (props.loading || searchTooShort.value) return
   const options = filteredOptions.value
   if (!options.length) return
 
@@ -275,14 +375,10 @@ function moveHighlight(direction: 1 | -1) {
   }
 }
 
-function highlightEdge(edge: 'first' | 'last') {
-  if (!isOpen.value) openList()
-  const options = edge === 'first' ? filteredOptions.value : [...filteredOptions.value].reverse()
-  highlightedKey.value = options.find((option) => !option.disabled)?.key ?? null
-}
-
 function chooseOption(option: (typeof visibleOptions.value)[number]) {
   if (option.disabled) return
+  cancelScheduledSearch()
+  cachedSelection.value = { value: option.value, label: option.label }
   emit('update:modelValue', option.value)
   query.value = option.label
   closeList(false)
@@ -293,16 +389,10 @@ function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
     event.preventDefault()
     moveHighlight(event.key === 'ArrowDown' ? 1 : -1)
-  } else if (event.key === 'Home' && isOpen.value) {
-    event.preventDefault()
-    highlightEdge('first')
-  } else if (event.key === 'End' && isOpen.value) {
-    event.preventDefault()
-    highlightEdge('last')
   } else if (event.key === 'Enter') {
     event.preventDefault()
     if (!isOpen.value) openList()
-    else {
+    else if (!props.loading && !searchTooShort.value) {
       const option = filteredOptions.value[highlightedIndex.value]
       if (option) chooseOption(option)
     }
@@ -320,11 +410,17 @@ function handleFocusOut(event: FocusEvent) {
 }
 
 function clearSelection() {
+  cachedSelection.value = null
   emit('update:modelValue', null)
   query.value = ''
+  if (props.filterable) scheduleSearch('')
   closeList(false)
   emit('clear')
 }
+
+onBeforeUnmount(() => {
+  cancelScheduledSearch()
+})
 </script>
 
 <template>
@@ -349,6 +445,7 @@ function clearSelection() {
           role="combobox"
           aria-autocomplete="list"
           :aria-expanded="isOpen ? 'true' : 'false'"
+          :aria-busy="loading ? 'true' : undefined"
           :aria-controls="listboxId"
           :aria-activedescendant="activeDescendant"
           :aria-required="required ? 'true' : undefined"
@@ -359,31 +456,49 @@ function clearSelection() {
           @input="handleInput"
           @keydown="handleKeydown"
         />
+        <span class="indicator" aria-hidden="true">
+          <CIcon v-if="loading" :rotate="1">↻</CIcon>
+          <span v-else>▼</span>
+        </span>
       </div>
 
-      <ul ref="listElement" v-show="isOpen" :id="listboxId" class="options" role="listbox">
-        <li
-          v-for="(option, index) in filteredOptions"
-          :id="`${listboxId}-option-${index}`"
-          :key="option.key"
-          class="option"
-          :class="{
-            'is-highlighted': option.key === highlightedKey,
-            'is-selected': valuesMatch(option.value, selection),
-            'is-disabled': option.disabled,
-          }"
-          role="option"
-          :aria-selected="valuesMatch(option.value, selection) ? 'true' : 'false'"
-          :aria-disabled="option.disabled ? 'true' : undefined"
-          @mousemove="!option.disabled && (highlightedKey = option.key)"
-          @mousedown.prevent
-          @click="chooseOption(option)"
-        >
-          {{ option.label }}
+      <ul
+        ref="listElement"
+        v-show="isOpen"
+        :id="listboxId"
+        class="options"
+        role="listbox"
+        :aria-busy="loading ? 'true' : undefined"
+      >
+        <li v-if="loading" class="empty" role="presentation">Loading…</li>
+        <li v-else-if="searchTooShort" class="empty" role="presentation">
+          Type at least {{ Math.max(0, minSearchLength) }}
+          {{ Math.max(0, minSearchLength) === 1 ? 'character' : 'characters' }}
         </li>
-        <li v-if="!filteredOptions.length" class="empty" role="presentation">
-          No matching options
-        </li>
+        <template v-else>
+          <li
+            v-for="(option, index) in filteredOptions"
+            :id="`${listboxId}-option-${index}`"
+            :key="option.key"
+            class="option"
+            :class="{
+              'is-highlighted': option.key === highlightedKey,
+              'is-selected': valuesMatch(option.value, selection),
+              'is-disabled': option.disabled,
+            }"
+            role="option"
+            :aria-selected="valuesMatch(option.value, selection) ? 'true' : 'false'"
+            :aria-disabled="option.disabled ? 'true' : undefined"
+            @mousemove="!option.disabled && (highlightedKey = option.key)"
+            @mousedown.prevent
+            @click="chooseOption(option)"
+          >
+            {{ option.label }}
+          </li>
+          <li v-if="!filteredOptions.length" class="empty" role="presentation">
+            No matching options
+          </li>
+        </template>
       </ul>
     </template>
 
@@ -461,18 +576,18 @@ function clearSelection() {
 .combobox {
   position: relative;
   display: flex;
+}
 
-  &::after {
-    position: absolute;
-    inset-inline-end: 9px;
-    top: 50%;
-    color: var(--c-muted-text-color, #68717d);
-    font-size: 10px;
-    line-height: 1;
-    pointer-events: none;
-    content: '▼';
-    transform: translateY(-50%);
-  }
+.indicator {
+  position: absolute;
+  inset-inline-end: 9px;
+  top: 50%;
+  display: inline-flex;
+  color: var(--c-muted-text-color, #68717d);
+  font-size: 10px;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateY(-50%);
 }
 
 .c-select {
