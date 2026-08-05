@@ -42,6 +42,51 @@ const router = createRouter({
           component: () => import('@/pages/components/Button.vue'),
         },
         {
+          path: 'form-field',
+          name: 'form-field',
+          component: () => import('@/pages/components/FormField.vue'),
+        },
+        {
+          path: 'input',
+          name: 'input',
+          component: () => import('@/pages/components/Input.vue'),
+        },
+        {
+          path: 'number-input',
+          name: 'number-input',
+          component: () => import('@/pages/components/NumberInput.vue'),
+        },
+        {
+          path: 'input-group',
+          name: 'input-group',
+          component: () => import('@/pages/components/InputGroup.vue'),
+        },
+        {
+          path: 'text-area',
+          name: 'text-area',
+          component: () => import('@/pages/components/TextArea.vue'),
+        },
+        {
+          path: 'password',
+          name: 'password',
+          component: () => import('@/pages/components/Password.vue'),
+        },
+        {
+          path: 'checkbox',
+          name: 'checkbox',
+          component: () => import('@/pages/components/Checkbox.vue'),
+        },
+        {
+          path: 'radio',
+          name: 'radio',
+          component: () => import('@/pages/components/Radio.vue'),
+        },
+        {
+          path: 'select',
+          name: 'select',
+          component: () => import('@/pages/components/Select.vue'),
+        },
+        {
           path: 'icon',
           name: 'icon',
           component: () => import('@/pages/components/Icon.vue'),
