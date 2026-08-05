@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 import CCodeBlock from '@/documentation/CCodeBlock.vue'
-import { CMenu, CSeparator, CSideBar } from '@/index'
+import { CButton, CMenu, CSeparator, CSideBar } from '@/index'
 import type { CMenuEntry, CMenuSelectEvent } from '@/index'
 
 const lastAction = ref('No item selected')
@@ -39,7 +39,7 @@ const navigation: CMenuEntry[] = [
 
 const sidebarUsage = `<CSideBar
   v-model:collapsed="sidebarCollapsed"
-  collapsible
+  collapse-button
   width="250px"
   aria-label="Application navigation"
 >
@@ -56,7 +56,7 @@ const sidebarUsage = `<CSideBar
   <template #footer>Administrator</template>
 </CSideBar>`
 
-const collapsibleUsage = `<script setup>
+const collapseUsage = `<script setup>
 import { ref } from 'vue'
 
 const sidebarCollapsed = ref(false)
@@ -64,7 +64,7 @@ const sidebarCollapsed = ref(false)
 
 <template>
   <CSideBar
-    collapsible
+    collapse-button
     v-model:collapsed="sidebarCollapsed"
     collapsed-width="38px"
     aria-label="Application navigation"
@@ -76,6 +76,14 @@ const sidebarCollapsed = ref(false)
     <CMenu :items="navigation" submenu-mode="inline" />
   </CSideBar>
 </template>`
+
+const externalCollapseUsage = `<CButton @click="sidebarCollapsed = !sidebarCollapsed">
+  Toggle sidebar
+</CButton>
+
+<CSideBar v-model:collapsed="sidebarCollapsed">
+  Externally controlled content
+</CSideBar>`
 
 const placementUsage = `<div class="workspace">
   <CSideBar placement="start" width="180px" aria-label="Navigation">
@@ -189,10 +197,15 @@ function recordSelection(event: CMenuSelectEvent) {
         </p>
       </div>
 
+      <div class="external-control">
+        <CButton @click="sidebarCollapsed = !sidebarCollapsed">Toggle from outside</CButton>
+        <span>Collapsed: {{ sidebarCollapsed }}</span>
+      </div>
+
       <div class="preview">
         <CSideBar
           v-model:collapsed="sidebarCollapsed"
-          collapsible
+          collapse-button
           width="250px"
           aria-label="Example sidebar"
         >
@@ -228,31 +241,34 @@ function recordSelection(event: CMenuSelectEvent) {
       <div class="description">
         <h2>Collapsible sidebar</h2>
         <p>
-          Add <code>collapsible</code> to show a boxed menu button before the header content. The
-          sidebar slides between its expanded and collapsed widths and keeps its menu state,
-          including expanded menu branches.
+          Bind <code>collapsed</code> to control whether the sidebar is open, independently of how
+          that state is changed. Add <code>collapse-button</code> only when the sidebar should render
+          its own boxed toggle before the header content. The sidebar preserves its menu state while
+          collapsed, including expanded menu branches.
         </p>
       </div>
 
       <dl class="property-list">
         <div>
-          <dt><code>collapsible</code></dt>
-          <dd>Enables the header toggle. Without it, the sidebar always remains expanded.</dd>
+          <dt><code>collapse-button</code></dt>
+          <dd>Shows the built-in header toggle. It does not enable or disable collapse behavior.</dd>
         </div>
         <div>
           <dt><code>collapsed</code></dt>
           <dd>
-            Controls the collapsed state through <code>v-model:collapsed</code>. The model is
-            optional; without it, <code>CSideBar</code> manages its own state.
+            Controls the collapsed state. Use <code>v-model:collapsed</code> with either the built-in
+            button or an external control. The built-in button can also manage its own state when no
+            model is supplied.
           </dd>
         </div>
         <div>
           <dt><code>collapsed-width</code></dt>
-          <dd>Sets the width of the collapsed toggle strip. The default is <code>38px</code>.</dd>
+          <dd>Sets the width of the collapsed sidebar. The default is <code>38px</code>.</dd>
         </div>
       </dl>
 
-      <CCodeBlock class="code-sample" :code="collapsibleUsage" />
+      <CCodeBlock class="code-sample" :code="collapseUsage" />
+      <CCodeBlock class="code-sample" :code="externalCollapseUsage" />
     </section>
 
     <section class="example">
@@ -419,6 +435,18 @@ function recordSelection(event: CMenuSelectEvent) {
 
   .code-sample {
     margin-top: 8px;
+  }
+
+  .external-control {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 8px;
+
+    span {
+      color: var(--c-muted-text-color, #626a75);
+      font-size: 12px;
+    }
   }
 
   .property-list {

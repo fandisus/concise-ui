@@ -9,7 +9,7 @@ const props = withDefaults(
     tag?: string
     placement?: CSideBarPlacement
     width?: string
-    collapsible?: boolean
+    collapseButton?: boolean
     collapsed?: boolean
     collapsedWidth?: string
     ariaLabel?: string
@@ -18,7 +18,7 @@ const props = withDefaults(
     tag: 'aside',
     placement: 'start',
     width: 'var(--c-side-bar-width, 240px)',
-    collapsible: false,
+    collapseButton: false,
     collapsed: undefined,
     collapsedWidth: '38px',
     ariaLabel: undefined,
@@ -30,9 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const internalCollapsed = ref(false)
-const isCollapsed = computed(() =>
-  props.collapsible ? (props.collapsed ?? internalCollapsed.value) : false,
-)
+const isCollapsed = computed(() => props.collapsed ?? internalCollapsed.value)
 
 const sideBarStyle = computed(() => ({
   '--c-side-bar-current-width': isCollapsed.value ? props.collapsedWidth : props.width,
@@ -60,9 +58,9 @@ function toggleCollapsed() {
     :style="sideBarStyle"
     :aria-label="ariaLabel"
   >
-    <div v-if="$slots.header || collapsible" class="header">
+    <div v-if="$slots.header || collapseButton" class="header">
       <CButton
-        v-if="collapsible"
+        v-if="collapseButton"
         class="toggle"
         icon="☰"
         :aria-expanded="!isCollapsed"
