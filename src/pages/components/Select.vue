@@ -217,7 +217,7 @@ const filterableUsage = `<CSelect
         <div><dt><code>options</code></dt><dd>Array of <code>{ label, value }</code> records or raw objects.</dd></div>
         <div><dt><code>option-label</code></dt><dd>Property path or function used to label raw object options.</dd></div>
         <div><dt><code>option-value</code></dt><dd>Property path or function selecting the bound value. Omit it to bind the complete object.</dd></div>
-        <div><dt><code>option-key</code></dt><dd>Property path or function providing a stable string or number key for raw objects.</dd></div>
+        <div><dt><code>option-key</code></dt><dd>Property path or function providing stable rendering and object-selection identity.</dd></div>
         <div><dt><code>clearable</code></dt><dd>Shows a compact × button that clears the selected model to <code>null</code>.</dd></div>
         <div><dt><code>filterable</code></dt><dd>Replaces the native select with a searchable, existing-options-only combobox.</dd></div>
         <div><dt><code>placeholder</code></dt><dd>Disabled initial option displayed while the model is null.</dd></div>

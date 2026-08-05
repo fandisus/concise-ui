@@ -106,6 +106,13 @@ export function useTopNavigation() {
           active: route.name === 'select',
           command: () => void router.push({ name: 'select' }),
         },
+        {
+          id: 'multi-select',
+          label: 'Multi Select',
+          icon: '☷',
+          active: route.name === 'multi-select',
+          command: () => void router.push({ name: 'multi-select' }),
+        },
         { type: 'separator' },
         {
           id: 'icon',
@@ -215,6 +222,13 @@ export function useComponentNavigation() {
       icon: '▾',
       active: route.name === 'select',
       command: () => void router.push({ name: 'select' }),
+    },
+    {
+      id: 'multi-select',
+      label: 'Multi Select',
+      icon: '☷',
+      active: route.name === 'multi-select',
+      command: () => void router.push({ name: 'multi-select' }),
     },
     { type: 'separator' },
     {

@@ -10,34 +10,35 @@ import type {
   CSelectOption,
   CSelectValue,
   CSelectValueAccessor,
-} from './types'
+} from '../select/types'
+import type { CMultiSelectModelValue } from './types'
 
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: CSelectValue | null
+    modelValue?: CMultiSelectModelValue
     options?: object[]
     optionLabel?: CSelectLabelAccessor
     optionValue?: CSelectValueAccessor
     optionKey?: CSelectKeyAccessor
     placeholder?: string
-    clearable?: boolean
     filterable?: boolean
+    clearable?: boolean
     size?: CFormControlSize
     disabled?: boolean
     required?: boolean
     invalid?: boolean
   }>(),
   {
-    modelValue: null,
+    modelValue: () => [],
     options: () => [],
     optionLabel: undefined,
     optionValue: undefined,
     optionKey: undefined,
     placeholder: undefined,
-    clearable: false,
     filterable: false,
+    clearable: false,
     size: 'medium',
     disabled: false,
     required: false,
@@ -46,25 +47,20 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  'update:modelValue': [value: CSelectValue | null]
+  'update:modelValue': [value: CMultiSelectModelValue]
   clear: []
 }>()
 
 const { controlId, describedBy, invalid, required } = useFormControl(props)
 const objectKeys = new WeakMap<object, number>()
-const listboxId = `c-select-listbox-${useId()}`
-const inputElement = ref<HTMLInputElement | null>(null)
+const listboxId = `c-multi-select-listbox-${useId()}`
+const controlElement = ref<HTMLElement | null>(null)
 const listElement = ref<HTMLUListElement | null>(null)
 const isOpen = ref(false)
 const isFiltering = ref(false)
 const query = ref('')
 const highlightedKey = ref<string | number | null>(null)
 let nextObjectKey = 0
-
-const selection = computed({
-  get: () => props.modelValue ?? null,
-  set: (value: CSelectValue | null) => emit('update:modelValue', value),
-})
 
 function readPath(option: object, path: string) {
   return path.split('.').reduce<unknown>((value, key) => {
@@ -98,7 +94,7 @@ function objectKey(value: object) {
   return key
 }
 
-function valuesMatch(left: CSelectValue | null, right: CSelectValue | null) {
+function valuesMatch(left: CSelectValue, right: CSelectValue) {
   if (Object.is(left, right)) return true
   if (
     props.optionValue ||
@@ -163,10 +159,21 @@ const visibleOptions = computed(() =>
   }),
 )
 
-const selectedOption = computed(() =>
-  visibleOptions.value.find((option) => valuesMatch(option.value, selection.value)),
+function selectedIndex(value: CSelectValue) {
+  return props.modelValue.findIndex((selected) => valuesMatch(selected, value))
+}
+
+function isSelected(value: CSelectValue) {
+  return selectedIndex(value) >= 0
+}
+
+const selectedLabels = computed(() =>
+  visibleOptions.value
+    .filter((option) => isSelected(option.value))
+    .map((option) => option.label),
 )
-const selectedLabel = computed(() => selectedOption.value?.label ?? '')
+const selectedSummary = computed(() => selectedLabels.value.join(', '))
+const displayText = computed(() => selectedSummary.value || props.placeholder || '')
 const filterText = computed(() => (isFiltering.value ? query.value.trim() : ''))
 const filteredOptions = computed(() => {
   const search = filterText.value.toLocaleLowerCase()
@@ -182,9 +189,9 @@ const activeDescendant = computed(() =>
 )
 
 watch(
-  selectedLabel,
-  (label) => {
-    if (!isOpen.value) query.value = label
+  selectedSummary,
+  (summary) => {
+    if (!isFiltering.value) query.value = summary
   },
   { immediate: true },
 )
@@ -206,20 +213,6 @@ watch(highlightedIndex, (index) => {
   })
 })
 
-watch(
-  [required, selection, () => props.filterable],
-  () => {
-    nextTick(() => {
-      inputElement.value?.setCustomValidity(
-        props.filterable && required.value && selection.value === null
-          ? 'Please select an option.'
-          : '',
-      )
-    })
-  },
-  { immediate: true },
-)
-
 function highlightFirstEnabled() {
   highlightedKey.value = filteredOptions.value.find((option) => !option.disabled)?.key ?? null
 }
@@ -227,27 +220,32 @@ function highlightFirstEnabled() {
 function openList() {
   if (props.disabled) return
   isOpen.value = true
-  const selected = selectedOption.value
-  highlightedKey.value = selected && !selected.disabled ? selected.key : null
-  if (highlightedKey.value === null) highlightFirstEnabled()
+  if (highlightedIndex.value < 0) highlightFirstEnabled()
 }
 
-function closeList(restoreLabel = true) {
+function closeList() {
   isOpen.value = false
   isFiltering.value = false
+  query.value = selectedSummary.value
   highlightedKey.value = null
-  if (restoreLabel) query.value = selectedLabel.value
 }
 
 function handleFocus(event: FocusEvent) {
   openList()
-  const input = event.currentTarget as HTMLInputElement
-  input.select()
+  if (props.filterable) (event.currentTarget as HTMLInputElement).select()
 }
 
 function handleClick(event: MouseEvent) {
   openList()
-  if (!isFiltering.value) (event.currentTarget as HTMLInputElement).select()
+  if (props.filterable && !isFiltering.value) {
+    const input = event.currentTarget as HTMLInputElement
+    input.select()
+  }
+}
+
+function handleControlClick() {
+  controlElement.value?.focus()
+  openList()
 }
 
 function handleInput(event: Event) {
@@ -255,6 +253,16 @@ function handleInput(event: Event) {
   isFiltering.value = true
   isOpen.value = true
   nextTick(highlightFirstEnabled)
+}
+
+function toggleOption(option: (typeof visibleOptions.value)[number]) {
+  if (option.disabled) return
+  const next = [...props.modelValue]
+  const index = selectedIndex(option.value)
+  if (index >= 0) next.splice(index, 1)
+  else next.push(option.value)
+  emit('update:modelValue', next)
+  controlElement.value?.focus()
 }
 
 function moveHighlight(direction: 1 | -1) {
@@ -281,14 +289,6 @@ function highlightEdge(edge: 'first' | 'last') {
   highlightedKey.value = options.find((option) => !option.disabled)?.key ?? null
 }
 
-function chooseOption(option: (typeof visibleOptions.value)[number]) {
-  if (option.disabled) return
-  emit('update:modelValue', option.value)
-  query.value = option.label
-  closeList(false)
-  inputElement.value?.focus()
-}
-
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
     event.preventDefault()
@@ -299,12 +299,12 @@ function handleKeydown(event: KeyboardEvent) {
   } else if (event.key === 'End' && isOpen.value) {
     event.preventDefault()
     highlightEdge('last')
-  } else if (event.key === 'Enter') {
+  } else if (event.key === 'Enter' || (event.key === ' ' && !props.filterable)) {
     event.preventDefault()
     if (!isOpen.value) openList()
     else {
       const option = filteredOptions.value[highlightedIndex.value]
-      if (option) chooseOption(option)
+      if (option) toggleOption(option)
     }
   } else if (event.key === 'Escape' && isOpen.value) {
     event.preventDefault()
@@ -320,131 +320,121 @@ function handleFocusOut(event: FocusEvent) {
 }
 
 function clearSelection() {
-  emit('update:modelValue', null)
+  emit('update:modelValue', [])
   query.value = ''
-  closeList(false)
+  isFiltering.value = false
   emit('clear')
 }
 </script>
 
 <template>
   <div
-    class="c-select-control"
-    :class="{ 'is-clearable': clearable, 'is-filterable': filterable }"
-    @focusout="filterable ? handleFocusOut($event) : undefined"
+    class="c-multi-select-control"
+    :class="{ 'is-clearable': clearable }"
+    @focusout="handleFocusOut"
   >
-    <template v-if="filterable">
-      <div class="combobox">
-        <input
-          ref="inputElement"
-          v-bind="$attrs"
-          class="c-select search"
-          :class="[`is-${size}`, { 'is-invalid': invalid, 'has-placeholder': !query }]"
-          :id="controlId"
-          :value="query"
-          :placeholder="placeholder"
-          :disabled="disabled"
-          :required="required"
-          autocomplete="off"
-          role="combobox"
-          aria-autocomplete="list"
-          :aria-expanded="isOpen ? 'true' : 'false'"
-          :aria-controls="listboxId"
-          :aria-activedescendant="activeDescendant"
-          :aria-required="required ? 'true' : undefined"
-          :aria-invalid="invalid ? 'true' : undefined"
-          :aria-describedby="describedBy"
-          @focus="handleFocus"
-          @click="handleClick"
-          @input="handleInput"
-          @keydown="handleKeydown"
-        />
-      </div>
-
-      <ul ref="listElement" v-show="isOpen" :id="listboxId" class="options" role="listbox">
-        <li
-          v-for="(option, index) in filteredOptions"
-          :id="`${listboxId}-option-${index}`"
-          :key="option.key"
-          class="option"
-          :class="{
-            'is-highlighted': option.key === highlightedKey,
-            'is-selected': valuesMatch(option.value, selection),
-            'is-disabled': option.disabled,
-          }"
-          role="option"
-          :aria-selected="valuesMatch(option.value, selection) ? 'true' : 'false'"
-          :aria-disabled="option.disabled ? 'true' : undefined"
-          @mousemove="!option.disabled && (highlightedKey = option.key)"
-          @mousedown.prevent
-          @click="chooseOption(option)"
-        >
-          {{ option.label }}
-        </li>
-        <li v-if="!filteredOptions.length" class="empty" role="presentation">
-          No matching options
-        </li>
-      </ul>
-    </template>
-
-    <select
-      v-else
-      v-model="selection"
+    <input
+      v-if="filterable"
+      ref="controlElement"
       v-bind="$attrs"
-      class="c-select"
-      :class="[
-        `is-${size}`,
-        {
-          'is-invalid': invalid,
-          'has-placeholder': Boolean(placeholder) && (modelValue ?? null) === null,
-        },
-      ]"
+      class="field search"
+      :class="[`is-${size}`, { 'is-invalid': invalid, 'has-placeholder': !query }]"
       :id="controlId"
+      :value="query"
+      :placeholder="placeholder"
       :disabled="disabled"
-      :required="required"
+      autocomplete="off"
+      role="combobox"
+      aria-autocomplete="list"
+      :aria-expanded="isOpen ? 'true' : 'false'"
+      :aria-controls="listboxId"
+      :aria-activedescendant="activeDescendant"
+      :aria-required="required ? 'true' : undefined"
       :aria-invalid="invalid ? 'true' : undefined"
       :aria-describedby="describedBy"
+      @focus="handleFocus"
+      @click="handleClick"
+      @input="handleInput"
+      @keydown="handleKeydown"
+    />
+
+    <div
+      v-else
+      ref="controlElement"
+      v-bind="$attrs"
+      class="field"
+      :class="[`is-${size}`, { 'is-invalid': invalid, 'has-placeholder': !modelValue.length, 'is-disabled': disabled }]"
+      :id="controlId"
+      :tabindex="disabled ? undefined : 0"
+      role="combobox"
+      :aria-expanded="isOpen ? 'true' : 'false'"
+      :aria-controls="listboxId"
+      :aria-activedescendant="activeDescendant"
+      :aria-required="required ? 'true' : undefined"
+      :aria-invalid="invalid ? 'true' : undefined"
+      :aria-describedby="describedBy"
+      @focus="handleFocus"
+      @click="handleControlClick"
+      @keydown="handleKeydown"
     >
-      <option v-if="placeholder" :value="null" disabled>{{ placeholder }}</option>
-      <option
-        v-for="option in visibleOptions"
-        :key="option.key"
-        :value="option.value"
-        :disabled="option.disabled"
-      >
-        {{ option.label }}
-      </option>
-      <slot />
-    </select>
+      <span class="value">{{ displayText }}</span>
+    </div>
 
     <CButton
       v-if="clearable"
       class="clear"
       icon="×"
       :size="size"
-      :disabled="disabled || (modelValue ?? null) === null"
+      :disabled="disabled || !modelValue.length"
       :aria-controls="controlId"
-      aria-label="Clear selection"
+      aria-label="Clear selections"
       @click="clearSelection"
     />
+
+    <ul
+      v-show="isOpen"
+      ref="listElement"
+      :id="listboxId"
+      class="options"
+      role="listbox"
+      aria-multiselectable="true"
+    >
+      <li
+        v-for="(option, index) in filteredOptions"
+        :id="`${listboxId}-option-${index}`"
+        :key="option.key"
+        class="option"
+        :class="{
+          'is-highlighted': option.key === highlightedKey,
+          'is-selected': isSelected(option.value),
+          'is-disabled': option.disabled,
+        }"
+        role="option"
+        :aria-selected="isSelected(option.value) ? 'true' : 'false'"
+        :aria-disabled="option.disabled ? 'true' : undefined"
+        @mousemove="!option.disabled && (highlightedKey = option.key)"
+        @mousedown.prevent
+        @click="toggleOption(option)"
+      >
+        <span class="check" aria-hidden="true">{{ isSelected(option.value) ? '✓' : '' }}</span>
+        <span>{{ option.label }}</span>
+      </li>
+      <li v-if="!filteredOptions.length" class="empty" role="presentation">
+        No matching options
+      </li>
+    </ul>
   </div>
 </template>
 
 <style scoped lang="scss">
-.c-select-control {
+.c-multi-select-control {
   position: relative;
   display: flex;
   width: 100%;
   min-width: 0;
 
-  .c-select,
-  .combobox {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
   &.is-clearable {
-    .c-select {
+    .field {
       border-start-end-radius: 0;
       border-end-end-radius: 0;
     }
@@ -458,9 +448,25 @@ function clearSelection() {
   }
 }
 
-.combobox {
+.field {
   position: relative;
+  box-sizing: border-box;
   display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+  min-width: 0;
+  padding: 4px 28px 4px 7px;
+  overflow: hidden;
+  color: var(--c-text-color, #20242a);
+  font: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: var(--c-input-background, #fff);
+  border: 1px solid var(--c-control-border-color, #bfc5ce);
+  border-radius: var(--c-border-radius, 3px);
 
   &::after {
     position: absolute;
@@ -473,38 +479,24 @@ function clearSelection() {
     content: '▼';
     transform: translateY(-50%);
   }
-}
-
-.c-select {
-  box-sizing: border-box;
-  width: 100%;
-  height: 30px;
-  min-width: 0;
-  padding: 4px 28px 4px 7px;
-  color: var(--c-text-color, #20242a);
-  font: inherit;
-  line-height: 1.2;
-  cursor: pointer;
-  background-color: var(--c-input-background, #fff);
-  border: 1px solid var(--c-control-border-color, #bfc5ce);
-  border-radius: var(--c-border-radius, 3px);
 
   &.search {
+    display: block;
     cursor: text;
   }
 
-  &:hover:not(:disabled) {
+  &:hover:not(.is-disabled):not(:disabled) {
     border-color: var(--c-control-hover-border-color, #929aa6);
   }
 
   &:focus {
-    position: relative;
     z-index: 1;
     border-color: var(--c-focus-color, #3578c6);
     outline: 1px solid var(--c-focus-color, #3578c6);
   }
 
-  &:disabled {
+  &:disabled,
+  &.is-disabled {
     color: var(--c-disabled-text-color, #8a9099);
     cursor: not-allowed;
     background-color: var(--c-disabled-background-color, #f1f3f5);
@@ -536,6 +528,11 @@ function clearSelection() {
   }
 }
 
+.value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .options {
   position: absolute;
   z-index: 20;
@@ -561,6 +558,9 @@ function clearSelection() {
 }
 
 .option {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 5px;
   cursor: default;
 
   &.is-highlighted {
@@ -568,13 +568,17 @@ function clearSelection() {
   }
 
   &.is-selected {
-    color: var(--c-primary-text-color, #fff);
-    background: var(--c-primary-color, #286aa6);
+    color: var(--c-primary-color, #286aa6);
+    font-weight: 600;
   }
 
   &.is-disabled {
     color: var(--c-disabled-text-color, #8a9099);
   }
+}
+
+.check {
+  text-align: center;
 }
 
 .empty {

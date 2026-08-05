@@ -87,6 +87,11 @@ const router = createRouter({
           component: () => import('@/pages/components/Select.vue'),
         },
         {
+          path: 'multi-select',
+          name: 'multi-select',
+          component: () => import('@/pages/components/MultiSelect.vue'),
+        },
+        {
           path: 'icon',
           name: 'icon',
           component: () => import('@/pages/components/Icon.vue'),

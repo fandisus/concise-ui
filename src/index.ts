@@ -7,6 +7,7 @@ export { default as CInputAddon } from './components/input-addon/CInputAddon.vue
 export { default as CInputGroup } from './components/input-group/CInputGroup.vue'
 export { default as CInput } from './components/input/CInput.vue'
 export { default as CMenu } from './components/menu/CMenu.vue'
+export { default as CMultiSelect } from './components/multi-select/CMultiSelect.vue'
 export { default as CNumberInput } from './components/number-input/CNumberInput.vue'
 export { default as CPassword } from './components/password/CPassword.vue'
 export { default as CRadio } from './components/radio/CRadio.vue'
@@ -27,6 +28,10 @@ export type {
 export type { CButtonSize, CButtonType, CButtonVariant } from './components/button/types'
 export type { CCheckboxModelValue, CCheckboxValue } from './components/checkbox/types'
 export type { CFormControlSize } from './components/form/types'
+export type {
+  CMultiSelectModelValue,
+  CMultiSelectValue,
+} from './components/multi-select/types'
 export type { CRadioValue } from './components/radio/types'
 export type {
   CSelectKeyAccessor,
