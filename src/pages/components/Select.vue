@@ -15,6 +15,7 @@ const products = [
 ]
 const selectedProduct = ref<(typeof products)[number] | null>(products[0] ?? null)
 const selectedProductId = ref<number | null>(1)
+const filteredProduct = ref<(typeof products)[number] | null>(null)
 
 const warehouses: CSelectOption[] = [
   { label: 'North warehouse', value: 'north' },
@@ -68,6 +69,17 @@ const objectUsage = `<CSelect
   :options="products"
   option-label="name"
   option-key="id"
+  clearable
+/>`
+
+const filterableUsage = `<CSelect
+  v-model="filteredProduct"
+  :options="products"
+  option-label="name"
+  option-key="id"
+  placeholder="Search products"
+  filterable
+  clearable
 />`
 </script>
 
@@ -76,8 +88,8 @@ const objectUsage = `<CSelect
     <header class="page-header">
       <div><p class="category">Forms</p><h1>Select</h1></div>
       <p>
-        <code>CSelect</code> styles a native single-value select and supports either data-driven
-        options or ordinary HTML option slots.
+        <code>CSelect</code> is a single-value selection control. It uses a native select by
+        default and can become a searchable combobox for longer data-driven lists.
       </p>
     </header>
     <CSeparator />
@@ -87,7 +99,8 @@ const objectUsage = `<CSelect
       <p>
         Pass raw objects with <code>option-label</code> to choose the displayed field. When
         <code>option-value</code> is omitted, selecting an option binds the complete object. Use
-        <code>option-key</code> to provide stable rendering identity.
+        <code>option-key</code> to provide stable rendering identity. Add <code>clearable</code> when
+        users should be able to return the model to <code>null</code>.
       </p>
       <div class="preview">
         <CFormField label="Product">
@@ -96,12 +109,42 @@ const objectUsage = `<CSelect
             :options="products"
             option-label="name"
             option-key="id"
+            clearable
           />
         </CFormField>
         <span>Selected object: {{ selectedProduct }}</span>
       </div>
       <CCodeBlock class="code-sample" :code="objectJavaScript" language="javascript" />
       <CCodeBlock class="code-sample" :code="objectUsage" />
+    </section>
+
+    <section class="section">
+      <h2>Filter existing options</h2>
+      <p>
+        Add <code>filterable</code> when a long list should be searchable. Typing narrows the
+        available options but does not create a new value: <code>v-model</code> changes only when
+        the user selects an existing option. Use <code>CAutoComplete</code> later when arbitrary
+        user-entered values should be allowed.
+      </p>
+      <p>
+        This mode works with data-driven <code>options</code>. Use Arrow Up or Arrow Down to move,
+        Enter to select, and Escape to discard the current search and restore the selected label.
+      </p>
+      <div class="preview">
+        <CFormField label="Product search">
+          <CSelect
+            v-model="filteredProduct"
+            :options="products"
+            option-label="name"
+            option-key="id"
+            placeholder="Search products"
+            filterable
+            clearable
+          />
+        </CFormField>
+        <span>Selected object: {{ filteredProduct }}</span>
+      </div>
+      <CCodeBlock class="code-sample" :code="filterableUsage" />
     </section>
 
     <section class="section">
@@ -142,7 +185,9 @@ const objectUsage = `<CSelect
       <h2>Native option slot</h2>
       <p>
         Use the default slot when native <code>option</code> or <code>optgroup</code> markup is more
-        convenient. Data-driven and slotted options can also be combined.
+        convenient. Data-driven and slotted options can also be combined. Slotted options are
+        available in the default native mode; <code>filterable</code> reads from the
+        <code>options</code> prop instead.
       </p>
       <div class="preview">
         <CFormField label="Priority">
@@ -173,10 +218,12 @@ const objectUsage = `<CSelect
         <div><dt><code>option-label</code></dt><dd>Property path or function used to label raw object options.</dd></div>
         <div><dt><code>option-value</code></dt><dd>Property path or function selecting the bound value. Omit it to bind the complete object.</dd></div>
         <div><dt><code>option-key</code></dt><dd>Property path or function providing a stable string or number key for raw objects.</dd></div>
+        <div><dt><code>clearable</code></dt><dd>Shows a compact × button that clears the selected model to <code>null</code>.</dd></div>
+        <div><dt><code>filterable</code></dt><dd>Replaces the native select with a searchable, existing-options-only combobox.</dd></div>
         <div><dt><code>placeholder</code></dt><dd>Disabled initial option displayed while the model is null.</dd></div>
         <div><dt><code>size</code></dt><dd><code>small</code>, <code>medium</code>, or <code>large</code>.</dd></div>
         <div><dt><code>disabled</code></dt><dd>Disables selection and focus.</dd></div>
-        <div><dt><code>required</code></dt><dd>Applies native required validation.</dd></div>
+        <div><dt><code>required</code></dt><dd>Requires an actual option selection, including in filterable mode.</dd></div>
         <div><dt><code>invalid</code></dt><dd>Applies invalid styling and <code>aria-invalid</code>.</dd></div>
       </dl>
     </section>
