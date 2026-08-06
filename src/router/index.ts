@@ -97,6 +97,11 @@ const router = createRouter({
           component: () => import('@/pages/components/AutoComplete.vue'),
         },
         {
+          path: 'progress-bar',
+          name: 'progress-bar',
+          component: () => import('@/pages/components/ProgressBar.vue'),
+        },
+        {
           path: 'icon',
           name: 'icon',
           component: () => import('@/pages/components/Icon.vue'),

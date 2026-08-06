@@ -120,6 +120,13 @@ export function useTopNavigation() {
           active: route.name === 'auto-complete',
           command: () => void router.push({ name: 'auto-complete' }),
         },
+        {
+          id: 'progress-bar',
+          label: 'Progress Bar',
+          icon: '▰',
+          active: route.name === 'progress-bar',
+          command: () => void router.push({ name: 'progress-bar' }),
+        },
         { type: 'separator' },
         {
           id: 'icon',
@@ -243,6 +250,13 @@ export function useComponentNavigation() {
       icon: '⌕',
       active: route.name === 'auto-complete',
       command: () => void router.push({ name: 'auto-complete' }),
+    },
+    {
+      id: 'progress-bar',
+      label: 'Progress Bar',
+      icon: '▰',
+      active: route.name === 'progress-bar',
+      command: () => void router.push({ name: 'progress-bar' }),
     },
     { type: 'separator' },
     {

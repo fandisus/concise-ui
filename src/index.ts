@@ -11,6 +11,7 @@ export { default as CMenu } from './components/menu/CMenu.vue'
 export { default as CMultiSelect } from './components/multi-select/CMultiSelect.vue'
 export { default as CNumberInput } from './components/number-input/CNumberInput.vue'
 export { default as CPassword } from './components/password/CPassword.vue'
+export { default as CProgressBar } from './components/progress-bar/CProgressBar.vue'
 export { default as CRadio } from './components/radio/CRadio.vue'
 export { default as CSelect } from './components/select/CSelect.vue'
 export { default as CSeparator } from './components/separator/CSeparator.vue'
@@ -34,6 +35,10 @@ export type {
   CMultiSelectValue,
 } from './components/multi-select/types'
 export type { CRadioValue } from './components/radio/types'
+export type {
+  CProgressBarSize,
+  CProgressBarVariant,
+} from './components/progress-bar/types'
 export type {
   CSelectKeyAccessor,
   CSelectLabelAccessor,
