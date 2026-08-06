@@ -149,6 +149,43 @@ Example:
 Naming should remain consistent across the framework.
 ---
 
+# Creating a New Component
+
+Use this checklist whenever adding a public Concise UI component.
+
+1. Define the component contract before implementation:
+   - purpose and expected behavior
+   - props, events, slots, and `v-model` shape
+   - disabled, loading, empty, invalid, or indeterminate states where relevant
+   - mouse and keyboard behavior
+2. Create the component under `src/components/<kebab-name>/C<ComponentName>.vue`.
+3. Add `types.ts` beside the component when it has reusable public types. Reuse existing shared types, such as form-control sizes, instead of duplicating them.
+4. Follow the established implementation style:
+   - Vue 3 `<script setup lang="ts">`
+   - scoped SCSS with a `.c-*` root class
+   - compact dimensions and theme CSS variables
+   - no new dependency when native Vue, HTML, or CSS is sufficient
+5. Implement accessibility as part of the component:
+   - native semantics where possible
+   - appropriate roles and ARIA state otherwise
+   - labels or accessible-name support
+   - keyboard navigation for interactive components
+   - reduced-motion handling for meaningful animations
+6. Export the component from `src/index.ts`. Export its public TypeScript types there as well.
+7. Create a documentation page under `src/pages/components/<ComponentName>.vue` containing:
+   - a short purpose statement
+   - live examples for primary behavior
+   - important states, sizes, and variants
+   - JavaScript and Vue usage through `CCodeBlock` where useful
+   - a properties, events, and slots reference
+8. Register the documentation route in `src/router/index.ts`.
+9. Add the page to both component-navigation lists in `src/layouts/useLayoutNavigation.ts`, including its active state and route command.
+10. Review the complete change for API consistency, accessibility, compact presentation, documentation accuracy, and accidental unrelated edits. At minimum, run `git diff --check`.
+
+For example, creating `CProgressBar` includes the component and public types, determinate and indeterminate behavior, optional value text, semantic variants, sizes, accessibility, documentation, routing, navigation, and public exports.
+
+---
+
 # Themes
 Themes should modify only presentation.
 Themes should NOT change:
