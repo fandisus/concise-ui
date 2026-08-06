@@ -1,54 +1,176 @@
-# concise-ui
+# Concise UI
 
-This template should help get you started developing with Vue 3 in Vite.
+Concise UI is a Vue 3 component framework for desktop-first enterprise and productivity software.
 
-## Recommended IDE Setup
+It is designed for applications such as ERP, WMS, CRM, POS, finance, inventory, administration, and other internal business systems. The goal is a compact, professional interface that displays information efficiently without imitating Bootstrap, Material Design, or old desktop software.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+> Concise UI is currently under active development. Its public API may change before the first stable release.
 
-## Recommended Browser Setup
+## Design principles
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- High information density with compact controls and restrained spacing
+- Clear hierarchy through typography, borders, and layout
+- Conservative use of color for actions, status, selection, and validation
+- Desktop-first mouse and keyboard interaction
+- Accessible native semantics where possible
+- Lightweight components without unnecessary runtime dependencies
+- Scoped SCSS and CSS variables for theme customization
+- Predictable Vue APIs and public TypeScript types
 
-## Type Support for `.vue` Imports in TS
+The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Components
 
-## Customize configuration
+### Navigation and layout
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- `CAppBar`
+- `CMenu`
+- `CSeparator`
+- `CSideBar`
 
-## Project Setup
+### Actions and feedback
+
+- `CButton`
+- `CProgressBar`
+
+### Form structure
+
+- `CFormField`
+- `CInputGroup`
+- `CInputAddon`
+
+### Inputs
+
+- `CInput`
+- `CTextArea`
+- `CPassword`
+- `CNumberInput`
+
+### Selection controls
+
+- `CCheckbox`
+- `CRadio`
+- `CSelect`
+- `CMultiSelect`
+- `CAutoComplete`
+
+### Symbols
+
+- `CIcon`
+
+`CIcon` displays Unicode symbols and emoji supplied by the application. Concise UI does not bundle an icon font or emoji package.
+
+## Basic usage
+
+Components and their public types are exported from the package entry point:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { CButton, CFormField, CInput, CProgressBar } from '@icfm/concise-ui'
+
+const name = ref('')
+const progress = ref(35)
+</script>
+
+<template>
+  <CFormField label="Customer name" required>
+    <CInput v-model="name" placeholder="Enter a name" />
+  </CFormField>
+
+  <CButton variant="primary">Save</CButton>
+  <CProgressBar :value="progress" show-value />
+</template>
+```
+
+Component styling is authored as scoped SCSS and uses theme variables. The production build emits `dist/concise-ui.css` alongside the JavaScript bundles; applications must include that generated stylesheet. Theme variables can customize presentation without changing component behavior.
+
+## Data-driven selection
+
+`CSelect` and `CMultiSelect` accept standard `{ label, value }` records or raw objects with accessor props:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { CSelect } from '@icfm/concise-ui'
+
+const products = [
+  { id: 1, name: 'Book', code: 'BOO' },
+  { id: 2, name: 'Stove', code: 'STV' },
+]
+
+const selectedProduct = ref(null)
+</script>
+
+<template>
+  <CSelect
+    v-model="selectedProduct"
+    :options="products"
+    option-label="name"
+    option-key="id"
+    filterable
+    clearable
+  />
+</template>
+```
+
+Omitting `option-value` binds the complete object. Adding `option-value="id"` binds only the ID.
+
+Filterable `CSelect` and `CAutoComplete` also support parent-controlled remote searching through `@search`, `debounce-wait`, `min-search-length`, and `loading`. Components coordinate the interaction but leave authentication, networking, cancellation, and error handling to the application.
+
+## Documentation application
+
+The repository contains a documentation application with live examples and highlighted Vue and JavaScript snippets for the public components.
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Open the local URL printed by Vite and navigate to **Components**.
+
+## Development commands
 
 ```sh
+# Start the documentation development server
+npm run dev
+
+# Type-check, build the library, and emit declarations
 npm run build
-```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
+# Run unit tests
 npm run test:unit
-```
 
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
+# Run the configured linters
 npm run lint
+
+# Format source files
+npm run format
 ```
+
+The supported Node.js versions are `^22.18.0` or `>=24.12.0`. Vue `^3.5.0` is a peer dependency.
+
+## Project structure
+
+```text
+src/
+├─ components/       Public component implementations and types
+├─ documentation/    Documentation-only components
+├─ layouts/          Documentation application layouts
+├─ pages/components/ Component guides and live examples
+├─ router/           Documentation routes
+├─ styles/           Documentation application styles
+└─ index.ts          Public library exports
+```
+
+## Adding a component
+
+The required component workflow is documented in [AGENTS.md](./AGENTS.md#creating-a-new-component). In summary:
+
+1. Define the API, states, events, slots, model shape, and keyboard behavior.
+2. Implement the component and any reusable public types.
+3. Include accessibility and theme-aware compact styling.
+4. Export the component and its public types from `src/index.ts`.
+5. Create its documentation page with live examples and code snippets.
+6. Register its documentation route and both navigation entries.
+7. Review API consistency, accessibility, documentation accuracy, and the final diff.
