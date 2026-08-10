@@ -29,11 +29,25 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'app-bar-menu' }),
         },
         {
+          id: 'context-menu',
+          label: 'Context Menu',
+          icon: '▤',
+          active: route.name === 'context-menu',
+          command: () => void router.push({ name: 'context-menu' }),
+        },
+        {
           id: 'sidebar',
           label: 'Sidebar',
           icon: '◧',
           active: route.name === 'sidebar',
           command: () => void router.push({ name: 'sidebar' }),
+        },
+        {
+          id: 'panel',
+          label: 'Panel',
+          icon: '▧',
+          active: route.name === 'panel',
+          command: () => void router.push({ name: 'panel' }),
         },
         { type: 'separator' },
         {
@@ -127,6 +141,13 @@ export function useTopNavigation() {
           active: route.name === 'progress-bar',
           command: () => void router.push({ name: 'progress-bar' }),
         },
+        {
+          id: 'toast',
+          label: 'Toast',
+          icon: '▣',
+          active: route.name === 'toast',
+          command: () => void router.push({ name: 'toast' }),
+        },
         { type: 'separator' },
         {
           id: 'icon',
@@ -160,11 +181,25 @@ export function useComponentNavigation() {
       command: () => void router.push({ name: 'app-bar-menu' }),
     },
     {
+      id: 'context-menu',
+      label: 'Context Menu',
+      icon: '▤',
+      active: route.name === 'context-menu',
+      command: () => void router.push({ name: 'context-menu' }),
+    },
+    {
       id: 'sidebar',
       label: 'Sidebar',
       icon: '◧',
       active: route.name === 'sidebar',
       command: () => void router.push({ name: 'sidebar' }),
+    },
+    {
+      id: 'panel',
+      label: 'Panel',
+      icon: '▧',
+      active: route.name === 'panel',
+      command: () => void router.push({ name: 'panel' }),
     },
     { type: 'separator' },
     {
@@ -257,6 +292,13 @@ export function useComponentNavigation() {
       icon: '▰',
       active: route.name === 'progress-bar',
       command: () => void router.push({ name: 'progress-bar' }),
+    },
+    {
+      id: 'toast',
+      label: 'Toast',
+      icon: '▣',
+      active: route.name === 'toast',
+      command: () => void router.push({ name: 'toast' }),
     },
     { type: 'separator' },
     {

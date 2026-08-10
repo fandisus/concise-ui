@@ -32,9 +32,19 @@ const router = createRouter({
           component: () => import('@/pages/components/AppBarMenu.vue'),
         },
         {
+          path: 'context-menu',
+          name: 'context-menu',
+          component: () => import('@/pages/components/ContextMenu.vue'),
+        },
+        {
           path: 'sidebar',
           name: 'sidebar',
           component: () => import('@/pages/components/Sidebar.vue'),
+        },
+        {
+          path: 'panel',
+          name: 'panel',
+          component: () => import('@/pages/components/Panel.vue'),
         },
         {
           path: 'button',
@@ -100,6 +110,11 @@ const router = createRouter({
           path: 'progress-bar',
           name: 'progress-bar',
           component: () => import('@/pages/components/ProgressBar.vue'),
+        },
+        {
+          path: 'toast',
+          name: 'toast',
+          component: () => import('@/pages/components/Toast.vue'),
         },
         {
           path: 'icon',

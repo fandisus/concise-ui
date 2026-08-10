@@ -24,7 +24,9 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 ### Navigation and layout
 
 - `CAppBar`
+- `CContextMenu`
 - `CMenu`
+- `CPanel`
 - `CSeparator`
 - `CSideBar`
 
@@ -32,6 +34,7 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 
 - `CButton`
 - `CProgressBar`
+- `CToast`
 
 ### Form structure
 
