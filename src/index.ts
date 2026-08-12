@@ -23,6 +23,8 @@ export { default as CTextArea } from './components/text-area/CTextArea.vue'
 export { default as CToast } from './components/toast/CToast.vue'
 export { CPrompt } from './services/prompt/prompt'
 export { CPromptPlugin } from './services/prompt/plugin'
+export { CToastService } from './services/toast/toast'
+export { CToastPlugin } from './services/toast/plugin'
 
 export type {
   CMenuActionItem,
@@ -87,3 +89,11 @@ export type {
   CPromptSelectOptions,
   CPromptService,
 } from './services/prompt/types'
+export type {
+  CToastPluginOptions,
+  CToastSemanticItem,
+  CToastServiceApi,
+  CToastServiceCloseEvent,
+  CToastServiceCloseReason,
+  CToastServiceItem,
+} from './services/toast/types'

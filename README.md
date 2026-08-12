@@ -36,7 +36,7 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 - `CDialog`
 - `CProgressBar`
 - `CPrompt` / `CPromptPlugin`
-- `CToast`
+- `CToast` / `CToastService` / `CToastPlugin`
 
 ### Form structure
 
@@ -115,6 +115,26 @@ const confirmed = await CPrompt.confirm({
 ```
 
 Calls are queued when another prompt is open. Selection prompts are always filterable and return the selected string or original object.
+
+## Programmatic toasts
+
+Install `CToastPlugin` to create a shared toast host automatically:
+
+```js
+import { CToastPlugin, CToastService } from '@icfm/concise-ui'
+
+app.use(CToastPlugin, { position: 'top-end' })
+
+CToastService.success({
+  title: 'Saved',
+  message: 'The record was saved successfully.',
+  onClose(event) {
+    console.log(event.reason)
+  },
+})
+```
+
+The service manages its own item identities. Items may define `onAutoClose`, `onUserClose`, and `onClose` callbacks. The declarative `CToast` component remains available when an application needs direct array ownership or custom item slots.
 
 ## Data-driven selection
 

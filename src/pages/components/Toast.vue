@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { CButton, CSeparator, CToast } from '@/index'
+import { CButton, CSeparator, CToast, CToastService } from '@/index'
 import type {
   CToastCloseEvent,
   CToastItem,
@@ -58,6 +58,53 @@ const basicUsage = `<CToast v-model="toasts" position="top-end" />
 
 <CButton @click="notifySaved">Save</CButton>`
 
+const pluginUsage = `import { createApp } from 'vue'
+import { CToastPlugin } from '@icfm/concise-ui'
+import App from './App.vue'
+
+createApp(App)
+  .use(CToastPlugin, {
+    position: 'top-end',
+    duration: 5000,
+  })
+  .mount('#app')`
+
+const serviceUsage = `import { CToastService } from '@icfm/concise-ui'
+
+CToastService.success({
+  title: 'Saved',
+  message: 'The customer record was saved successfully.',
+})
+
+CToastService.error({
+  title: 'Save failed',
+  message: 'The server rejected the latest changes.',
+  duration: 0,
+  onUserClose(event) {
+    console.log('Closed by the user', event.item)
+  },
+  onClose(event) {
+    console.log('Toast finished:', event.reason)
+  },
+})
+
+CToastService.clear()`
+
+const callbackUsage = `CToastService.info({
+  title: 'Synchronization',
+  message: 'Updated records are available.',
+  onAutoClose(event) {
+    console.log('Timer elapsed', event.item)
+  },
+  onUserClose(event) {
+    console.log('Dismiss button used', event.item)
+  },
+  onClose(event) {
+    // Runs after either callback above, and also after clear().
+    console.log(event.reason) // timeout, dismiss, or clear
+  },
+})`
+
 const persistentUsage = `toasts.value.push({
   title: 'Connection lost',
   message: 'Reconnect before continuing.',
@@ -85,7 +132,8 @@ const customUsage = `<CToast v-model="toasts">
       <div><p class="category">Feedback</p><h1>Toast</h1></div>
       <p>
         <code>CToast</code> presents temporary, non-blocking notifications in a compact overlay
-        stack while the application owns the underlying message array.
+        stack. Use its array model directly or install <code>CToastPlugin</code> for a global
+        imperative service.
       </p>
     </header>
     <CSeparator />
@@ -93,7 +141,49 @@ const customUsage = `<CToast v-model="toasts">
     <CToast v-model="toasts" :position="position" @close="recordClose" />
 
     <section class="section">
-      <h2>Notification stack</h2>
+      <h2>Toast service</h2>
+      <p>
+        Install <code>CToastPlugin</code> once to create the host automatically. Then call
+        <code>CToastService</code> from any JavaScript module without adding <code>CToast</code> to
+        <code>App.vue</code>, maintaining an array, or generating IDs. Plugin options configure the
+        shared position, duration, close button, teleport target, and accessible label.
+      </p>
+      <div class="preview">
+        <div class="actions">
+          <CButton size="small" @click="CToastService.info({ title: 'Sync', message: 'Three records are available.' })">Info</CButton>
+          <CButton size="small" variant="success" @click="CToastService.success({ title: 'Saved', message: 'The record was saved.' })">Success</CButton>
+          <CButton size="small" variant="warning" @click="CToastService.warning({ title: 'Low stock', message: 'Printer paper is below its threshold.' })">Warning</CButton>
+          <CButton size="small" variant="danger" @click="CToastService.error({ title: 'Failed', message: 'The operation could not be completed.' })">Error</CButton>
+          <CButton size="small" @click="CToastService.clear()">Clear service toasts</CButton>
+        </div>
+        <span>The documentation service host appears at the bottom end of the viewport.</span>
+      </div>
+      <CCodeBlock class="code-sample" :code="pluginUsage" language="javascript" />
+      <CCodeBlock class="code-sample" :code="serviceUsage" language="javascript" />
+      <h3>Close callbacks</h3>
+      <p>
+        <code>onAutoClose</code> runs when the duration elapses, while
+        <code>onUserClose</code> runs when the dismiss button is used. <code>onClose</code> runs
+        afterward for either path and also when <code>clear()</code> removes the toast. Every
+        callback receives the original service item and a <code>timeout</code>,
+        <code>dismiss</code>, or <code>clear</code> reason.
+      </p>
+      <CCodeBlock class="code-sample" :code="callbackUsage" language="javascript" />
+      <dl class="property-list service-reference">
+        <div><dt><code>show()</code></dt><dd>Displays an item with an optional explicit variant.</dd></div>
+        <div><dt><code>info()</code></dt><dd>Displays an informational toast.</dd></div>
+        <div><dt><code>success()</code></dt><dd>Displays a success toast.</dd></div>
+        <div><dt><code>warning()</code></dt><dd>Displays a warning toast.</dd></div>
+        <div><dt><code>error()</code></dt><dd>Displays a danger-styled error toast.</dd></div>
+        <div><dt><code>clear()</code></dt><dd>Dismisses every toast owned by the service host.</dd></div>
+        <div><dt><code>onAutoClose</code></dt><dd>Optional item callback invoked after timeout dismissal.</dd></div>
+        <div><dt><code>onUserClose</code></dt><dd>Optional item callback invoked after close-button dismissal.</dd></div>
+        <div><dt><code>onClose</code></dt><dd>Optional item callback invoked for timeout, user dismissal, or service clearing.</dd></div>
+      </dl>
+    </section>
+
+    <section class="section">
+      <h2>Declarative notification stack</h2>
       <p>
         Mount one toast host near the application root and bind an array with <code>v-model</code>.
         Add records to display notifications. <code>CToast</code> assigns each record an internal
@@ -203,5 +293,9 @@ const customUsage = `<CToast v-model="toasts">
     align-items: center;
     gap: 5px;
   }
+}
+
+.service-reference {
+  margin-top: 10px !important;
 }
 </style>
