@@ -18,6 +18,7 @@ export interface CToastItem {
   variant?: CToastVariant
   duration?: number
   closable?: boolean
+  data?: unknown
 }
 
 export interface CToastCloseEvent {

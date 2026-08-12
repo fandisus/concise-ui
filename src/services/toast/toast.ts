@@ -38,6 +38,7 @@ function show(item: CToastServiceItem) {
     variant: item.variant,
     duration: item.duration,
     closable: item.closable,
+    data: item.data,
   }
   sourceItems.set(renderedItem, item)
   serviceToasts.value.push(renderedItem)

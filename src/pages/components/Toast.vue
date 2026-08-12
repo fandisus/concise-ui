@@ -119,11 +119,25 @@ const accentUsage = `:root {
 
 const customUsage = `<CToast v-model="toasts">
   <template #item="{ item, dismiss }">
-    <strong>{{ item.title }}</strong>
-    <p>{{ item.message }}</p>
-    <button type="button" @click="dismiss">Acknowledge</button>
+    <div class="cart-toast">
+      <img :src="item.data.thumbnailUrl" alt="" />
+      <div>
+        <strong>{{ item.title }}</strong>
+        <p>{{ item.message }}</p>
+      </div>
+      <button type="button" @click="dismiss">Close</button>
+    </div>
   </template>
 </CToast>`
+
+const customJavaScript = `toasts.value.push({
+  title: 'Added to cart',
+  message: 'Product A has been added to your cart.',
+  data: {
+    thumbnailUrl: '/images/product-a.jpg',
+    product: productA,
+  },
+})`
 </script>
 
 <template>
@@ -251,8 +265,10 @@ const customUsage = `<CToast v-model="toasts">
       <p>
         The <code>item</code> slot receives the toast record and a <code>dismiss()</code> callback.
         The semantic icon, outer notification styling, timer, and optional close button remain
-        managed by <code>CToast</code>.
+        managed by <code>CToast</code>. Put application-specific values such as a thumbnail URL or
+        product record in <code>data</code> rather than adding arbitrary top-level fields.
       </p>
+      <CCodeBlock class="code-sample" :code="customJavaScript" language="javascript" />
       <CCodeBlock class="code-sample" :code="customUsage" />
     </section>
 
@@ -271,6 +287,7 @@ const customUsage = `<CToast v-model="toasts">
         <div><dt><code>message</code></dt><dd>Required notification text.</dd></div>
         <div><dt><code>variant</code></dt><dd><code>default</code>, <code>success</code>, <code>info</code>, <code>warning</code>, or <code>danger</code>.</dd></div>
         <div><dt><code>icon</code></dt><dd>Optional Unicode icon replacing the variant's default symbol.</dd></div>
+        <div><dt><code>data</code></dt><dd>Optional application payload passed through unchanged to item slots, close events, and service callbacks.</dd></div>
       </dl>
     </section>
   </article>
