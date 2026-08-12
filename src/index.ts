@@ -3,6 +3,7 @@ export { default as CAutoComplete } from './components/auto-complete/CAutoComple
 export { default as CButton } from './components/button/CButton.vue'
 export { default as CCheckbox } from './components/checkbox/CCheckbox.vue'
 export { default as CContextMenu } from './components/context-menu/CContextMenu.vue'
+export { default as CDialog } from './components/dialog/CDialog.vue'
 export { default as CFormField } from './components/form-field/CFormField.vue'
 export { default as CIcon } from './components/icon/CIcon.vue'
 export { default as CInputAddon } from './components/input-addon/CInputAddon.vue'
@@ -20,6 +21,8 @@ export { default as CSeparator } from './components/separator/CSeparator.vue'
 export { default as CSideBar } from './components/side-bar/CSideBar.vue'
 export { default as CTextArea } from './components/text-area/CTextArea.vue'
 export { default as CToast } from './components/toast/CToast.vue'
+export { CPrompt } from './services/prompt/prompt'
+export { CPromptPlugin } from './services/prompt/plugin'
 
 export type {
   CMenuActionItem,
@@ -37,6 +40,11 @@ export type {
   CContextMenuCloseReason,
   CContextMenuOpenEvent,
 } from './components/context-menu/types'
+export type {
+  CDialogCloseEvent,
+  CDialogCloseReason,
+  CDialogSize,
+} from './components/dialog/types'
 export type { CFormControlSize } from './components/form/types'
 export type {
   CMultiSelectModelValue,
@@ -70,3 +78,12 @@ export type {
   CGlyphSize,
   CGlyphSizeUnit,
 } from './components/glyph/types'
+export type {
+  CPromptBaseOptions,
+  CPromptConfirmOptions,
+  CPromptInputOptions,
+  CPromptMessageOptions,
+  CPromptPluginOptions,
+  CPromptSelectOptions,
+  CPromptService,
+} from './services/prompt/types'

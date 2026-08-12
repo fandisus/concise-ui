@@ -58,6 +58,20 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'button' }),
         },
         {
+          id: 'dialog',
+          label: 'Dialog',
+          icon: '▣',
+          active: route.name === 'dialog',
+          command: () => void router.push({ name: 'dialog' }),
+        },
+        {
+          id: 'prompt',
+          label: 'Prompt',
+          icon: '?',
+          active: route.name === 'prompt',
+          command: () => void router.push({ name: 'prompt' }),
+        },
+        {
           id: 'form-field',
           label: 'Form Field',
           icon: '▤',
@@ -208,6 +222,20 @@ export function useComponentNavigation() {
       icon: '▭',
       active: route.name === 'button',
       command: () => void router.push({ name: 'button' }),
+    },
+    {
+      id: 'dialog',
+      label: 'Dialog',
+      icon: '▣',
+      active: route.name === 'dialog',
+      command: () => void router.push({ name: 'dialog' }),
+    },
+    {
+      id: 'prompt',
+      label: 'Prompt',
+      icon: '?',
+      active: route.name === 'prompt',
+      command: () => void router.push({ name: 'prompt' }),
     },
     {
       id: 'form-field',

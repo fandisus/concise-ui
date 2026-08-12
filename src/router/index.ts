@@ -52,6 +52,16 @@ const router = createRouter({
           component: () => import('@/pages/components/Button.vue'),
         },
         {
+          path: 'dialog',
+          name: 'dialog',
+          component: () => import('@/pages/components/Dialog.vue'),
+        },
+        {
+          path: 'prompt',
+          name: 'prompt',
+          component: () => import('@/pages/components/Prompt.vue'),
+        },
+        {
           path: 'form-field',
           name: 'form-field',
           component: () => import('@/pages/components/FormField.vue'),

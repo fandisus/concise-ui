@@ -33,7 +33,9 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 ### Actions and feedback
 
 - `CButton`
+- `CDialog`
 - `CProgressBar`
+- `CPrompt` / `CPromptPlugin`
 - `CToast`
 
 ### Form structure
@@ -87,6 +89,32 @@ const progress = ref(35)
 ```
 
 Component styling is authored as scoped SCSS and uses theme variables. The production build emits `dist/concise-ui.css` alongside the JavaScript bundles; applications must include that generated stylesheet. Theme variables can customize presentation without changing component behavior.
+
+## Programmatic prompts
+
+Install the prompt plugin once; it mounts its internal host without requiring template markup:
+
+```js
+import { createApp } from 'vue'
+import { CPromptPlugin } from '@icfm/concise-ui'
+import App from './App.vue'
+
+createApp(App).use(CPromptPlugin).mount('#app')
+```
+
+Prompts use a JavaScript-friendly options object and return promises:
+
+```js
+import { CPrompt } from '@icfm/concise-ui'
+
+const confirmed = await CPrompt.confirm({
+  question: 'Delete this record?',
+  confirmLabel: 'Delete',
+  confirmVariant: 'danger',
+})
+```
+
+Calls are queued when another prompt is open. Selection prompts are always filterable and return the selected string or original object.
 
 ## Data-driven selection
 
