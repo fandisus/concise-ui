@@ -82,6 +82,11 @@ const router = createRouter({
           component: () => import('@/pages/components/NumberInput.vue'),
         },
         {
+          path: 'date-picker',
+          name: 'date-picker',
+          component: () => import('@/pages/components/DatePicker.vue'),
+        },
+        {
           path: 'input-group',
           name: 'input-group',
           component: () => import('@/pages/components/InputGroup.vue'),

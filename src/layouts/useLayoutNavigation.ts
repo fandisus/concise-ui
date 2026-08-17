@@ -100,6 +100,13 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'number-input' }),
         },
         {
+          id: 'date-picker',
+          label: 'Date Picker',
+          icon: '◫',
+          active: route.name === 'date-picker',
+          command: () => void router.push({ name: 'date-picker' }),
+        },
+        {
           id: 'input-group',
           label: 'Input Group',
           icon: '⊞',
@@ -285,6 +292,13 @@ export function useComponentNavigation() {
       icon: '±',
       active: route.name === 'number-input',
       command: () => void router.push({ name: 'number-input' }),
+    },
+    {
+      id: 'date-picker',
+      label: 'Date Picker',
+      icon: '◫',
+      active: route.name === 'date-picker',
+      command: () => void router.push({ name: 'date-picker' }),
     },
     {
       id: 'input-group',

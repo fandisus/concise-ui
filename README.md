@@ -56,6 +56,7 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 - `CTextArea`
 - `CPassword`
 - `CNumberInput`
+- `CDatePicker`
 
 ### Selection controls
 

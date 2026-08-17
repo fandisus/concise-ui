@@ -4,6 +4,7 @@ export { default as CButton } from './components/button/CButton.vue'
 export { default as CCheckbox } from './components/checkbox/CCheckbox.vue'
 export { default as CContextMenu } from './components/context-menu/CContextMenu.vue'
 export { default as CDataTable } from './components/data-table/CDataTable.vue'
+export { default as CDatePicker } from './components/date-picker/CDatePicker.vue'
 export { default as CDebounceInput } from './components/debounce-input/CDebounceInput.vue'
 export { default as CDialog } from './components/dialog/CDialog.vue'
 export { default as CFormField } from './components/form-field/CFormField.vue'
@@ -52,6 +53,11 @@ export type {
   CDataTableQueryFilters,
   CDataTableRow,
 } from './components/data-table/types'
+export type {
+  CDatePickerDate,
+  CDatePickerModelValue,
+  CDatePickerRangeValue,
+} from './components/date-picker/types'
 export type {
   CDialogCloseEvent,
   CDialogCloseReason,
