@@ -163,6 +163,13 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'progress-bar' }),
         },
         {
+          id: 'table',
+          label: 'Table',
+          icon: '▦',
+          active: route.name === 'table',
+          command: () => void router.push({ name: 'table' }),
+        },
+        {
           id: 'toast',
           label: 'Toast',
           icon: '▣',
@@ -334,6 +341,13 @@ export function useComponentNavigation() {
       icon: '▰',
       active: route.name === 'progress-bar',
       command: () => void router.push({ name: 'progress-bar' }),
+    },
+    {
+      id: 'table',
+      label: 'Table',
+      icon: '▦',
+      active: route.name === 'table',
+      command: () => void router.push({ name: 'table' }),
     },
     {
       id: 'toast',

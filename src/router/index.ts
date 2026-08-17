@@ -127,6 +127,11 @@ const router = createRouter({
           component: () => import('@/pages/components/ProgressBar.vue'),
         },
         {
+          path: 'table',
+          name: 'table',
+          component: () => import('@/pages/components/Table.vue'),
+        },
+        {
           path: 'toast',
           name: 'toast',
           component: () => import('@/pages/components/Toast.vue'),

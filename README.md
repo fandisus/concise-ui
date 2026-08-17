@@ -38,6 +38,10 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 - `CPrompt` / `CPromptPlugin`
 - `CToast` / `CToastService` / `CToastPlugin`
 
+### Data display
+
+- `CTable`
+
 ### Form structure
 
 - `CFormField`
