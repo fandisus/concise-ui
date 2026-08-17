@@ -72,6 +72,11 @@ const router = createRouter({
           component: () => import('@/pages/components/Input.vue'),
         },
         {
+          path: 'debounce-input',
+          name: 'debounce-input',
+          component: () => import('@/pages/components/DebounceInput.vue'),
+        },
+        {
           path: 'number-input',
           name: 'number-input',
           component: () => import('@/pages/components/NumberInput.vue'),

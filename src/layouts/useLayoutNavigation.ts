@@ -86,6 +86,13 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'input' }),
         },
         {
+          id: 'debounce-input',
+          label: 'Debounce Input',
+          icon: '…',
+          active: route.name === 'debounce-input',
+          command: () => void router.push({ name: 'debounce-input' }),
+        },
+        {
           id: 'number-input',
           label: 'Number Input',
           icon: '±',
@@ -250,6 +257,13 @@ export function useComponentNavigation() {
       icon: '⌨',
       active: route.name === 'input',
       command: () => void router.push({ name: 'input' }),
+    },
+    {
+      id: 'debounce-input',
+      label: 'Debounce Input',
+      icon: '…',
+      active: route.name === 'debounce-input',
+      command: () => void router.push({ name: 'debounce-input' }),
     },
     {
       id: 'number-input',

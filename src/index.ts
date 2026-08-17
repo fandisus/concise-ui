@@ -3,6 +3,7 @@ export { default as CAutoComplete } from './components/auto-complete/CAutoComple
 export { default as CButton } from './components/button/CButton.vue'
 export { default as CCheckbox } from './components/checkbox/CCheckbox.vue'
 export { default as CContextMenu } from './components/context-menu/CContextMenu.vue'
+export { default as CDebounceInput } from './components/debounce-input/CDebounceInput.vue'
 export { default as CDialog } from './components/dialog/CDialog.vue'
 export { default as CFormField } from './components/form-field/CFormField.vue'
 export { default as CIcon } from './components/icon/CIcon.vue'

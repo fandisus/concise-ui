@@ -47,6 +47,7 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 ### Inputs
 
 - `CInput`
+- `CDebounceInput`
 - `CTextArea`
 - `CPassword`
 - `CNumberInput`
