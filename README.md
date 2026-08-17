@@ -21,7 +21,7 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 
 ## Components
 
-### Navigation and layout
+### Layout and menus
 
 - `CAppBar`
 - `CContextMenu`
@@ -30,43 +30,34 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 - `CSeparator`
 - `CSideBar`
 
-### Actions and feedback
+### Forms
 
 - `CButton`
-- `CDialog`
 - `CProgressBar`
-- `CPrompt` / `CPromptPlugin`
-- `CToast` / `CToastService` / `CToastPlugin`
-
-### Data display
-
-- `CTable`
-- `CDataTable`
-
-### Form structure
-
 - `CFormField`
 - `CInputGroup`
 - `CInputAddon`
-
-### Inputs
-
 - `CInput`
 - `CDebounceInput`
 - `CTextArea`
 - `CPassword`
 - `CNumberInput`
 - `CDatePicker`
-
-### Selection controls
-
 - `CCheckbox`
 - `CRadio`
 - `CSelect`
 - `CMultiSelect`
 - `CAutoComplete`
 
-### Symbols
+### Data and feedback
+
+- `CDialog`
+- `CPrompt` / `CPromptPlugin`
+- `CTable`
+- `CDataTable`
+- `CToast` / `CToastService` / `CToastPlugin`
+
+### Icons
 
 - `CIcon`
 

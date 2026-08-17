@@ -25,9 +25,10 @@ const appBarJavaScript = `const mainMenu = [
     label: 'File',
     icon: '▤',
     children: [
+      { label: 'Documents', type: 'header' },
       { label: 'New', icon: '+', command: () => createDocument() },
       { label: 'Open…', icon: '📂', command: () => openDocument() },
-      { type: 'separator' },
+      { label: 'Storage', type: 'header' },
       { label: 'Save', icon: '💾', command: () => saveDocument() },
     ],
   },
@@ -44,6 +45,7 @@ const appBarJavaScript = `const mainMenu = [
 ]`
 
 const itemStructureJavaScript = `const fileMenu = [
+  { label: 'Menus', type: 'header' },
   {
     label: 'File',
     icon: '▤',
@@ -53,6 +55,9 @@ const itemStructureJavaScript = `const fileMenu = [
       { label: 'Save', icon: '💾', command: () => saveDocument() },
     ],
   },
+  { label: 'Forms', type: 'header' },
+  { label: 'Input', url: '/components/input' },
+  { label: 'Date Picker', url: '/components/date-picker' },
 ]`
 
 const disabledAndHiddenJavaScript = `import { computed } from 'vue'
@@ -97,9 +102,10 @@ const topMenu: CMenuEntry[] = [
     label: 'File',
     icon: '▤',
     children: [
+      { label: 'Documents', type: 'header' },
       { label: 'New', icon: '+' },
       { label: 'Open…', icon: '📂' },
-      { type: 'separator' },
+      { label: 'Storage', type: 'header' },
       { label: 'Save', icon: '💾' },
       { label: 'Save As…', icon: '💾' },
     ],
@@ -194,8 +200,19 @@ function recordSelection(event: CMenuSelectEvent) {
           <dt><code>children</code></dt>
           <dd>
             An optional array of menu entries. Providing children turns the item into a submenu
-            trigger. Children can contain regular items, deeper submenus, and separators.
+            trigger. Children can contain regular items, deeper submenus, headers, and separators.
           </dd>
+        </div>
+        <div>
+          <dt><code>type: 'header'</code></dt>
+          <dd>
+            Displays a noninteractive group heading. Headers are skipped by keyboard navigation and
+            support <code>hidden</code> for conditional groups.
+          </dd>
+        </div>
+        <div>
+          <dt><code>type: 'separator'</code></dt>
+          <dd>Displays a noninteractive visual division between groups of items.</dd>
         </div>
       </dl>
 

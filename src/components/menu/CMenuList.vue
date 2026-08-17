@@ -56,7 +56,7 @@ function itemKey(item: CMenuEntry, index: number) {
 }
 
 function isActionItem(item: CMenuEntry): item is CMenuActionItem {
-  return item.type !== 'separator'
+  return item.type !== 'separator' && item.type !== 'header'
 }
 
 function hasChildren(item: CMenuActionItem) {
@@ -183,6 +183,15 @@ function onKeydown(event: KeyboardEvent) {
         <CSeparator
           :orientation="isRoot && orientation === 'horizontal' ? 'vertical' : 'horizontal'"
         />
+      </li>
+
+      <li
+        v-else-if="item.type === 'header'"
+        :class="['header', item.class]"
+        :style="item.style"
+        role="presentation"
+      >
+        <span>{{ item.label }}</span>
       </li>
 
       <li
@@ -350,8 +359,29 @@ function onKeydown(event: KeyboardEvent) {
     padding: 3px 6px;
   }
 
+  .header {
+    min-width: 0;
+    padding: var(--c-menu-header-padding, 9px 8px 3px);
+    overflow: hidden;
+    color: var(--c-menu-header-color, var(--c-muted-text-color, #626a75));
+    font-size: var(--c-menu-header-font-size, 10px);
+    font-weight: var(--c-menu-header-font-weight, 700);
+    line-height: 1.2;
+    letter-spacing: var(--c-menu-header-letter-spacing, 0.05em);
+    text-overflow: ellipsis;
+    text-transform: var(--c-menu-header-text-transform, uppercase);
+    white-space: nowrap;
+    background: var(--c-menu-header-background, transparent);
+  }
+
   &.is-horizontal > .separator {
     padding: 5px 3px;
+  }
+
+  &.is-horizontal > .header {
+    display: flex;
+    align-items: center;
+    padding: var(--c-menu-header-horizontal-padding, var(--c-menu-header-padding, 4px 8px));
   }
 
   &.submenu {

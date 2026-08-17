@@ -47,6 +47,11 @@ const router = createRouter({
           component: () => import('@/pages/components/Panel.vue'),
         },
         {
+          path: 'separator',
+          name: 'separator',
+          component: () => import('@/pages/components/Separator.vue'),
+        },
+        {
           path: 'button',
           name: 'button',
           component: () => import('@/pages/components/Button.vue'),

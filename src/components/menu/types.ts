@@ -26,6 +26,15 @@ export interface CMenuSeparatorItem {
   hidden?: boolean
 }
 
-export type CMenuEntry = CMenuActionItem | CMenuSeparatorItem
+export interface CMenuHeaderItem {
+  type: 'header'
+  id?: string
+  label: string
+  hidden?: boolean
+  class?: string | string[] | Record<string, boolean>
+  style?: string | Record<string, string | number>
+}
+
+export type CMenuEntry = CMenuActionItem | CMenuHeaderItem | CMenuSeparatorItem
 
 export interface CMenuSelectEvent extends CMenuCommandContext {}

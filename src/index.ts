@@ -34,6 +34,7 @@ export type {
   CMenuActionItem,
   CMenuCommandContext,
   CMenuEntry,
+  CMenuHeaderItem,
   CMenuOrientation,
   CMenuSelectEvent,
   CMenuSeparatorItem,

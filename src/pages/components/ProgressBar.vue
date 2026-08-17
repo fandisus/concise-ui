@@ -25,7 +25,7 @@ const customValueUsage = `<CProgressBar :value="3" :max="8" show-value>
 <template>
   <article class="form-page">
     <header class="page-header">
-      <div><p class="category">Feedback</p><h1>Progress Bar</h1></div>
+      <div><p class="category">Forms</p><h1>Progress Bar</h1></div>
       <p>
         <code>CProgressBar</code> communicates completion for bounded work or ongoing activity
         whose duration is not yet known.

@@ -21,6 +21,7 @@ export function useTopNavigation() {
       icon: '▦',
       active: route.path.startsWith('/components'),
       children: [
+        { id: 'layout-header', label: 'Layout & Menus', type: 'header' },
         {
           id: 'app-bar-menu',
           label: 'AppBar & Menu',
@@ -49,27 +50,20 @@ export function useTopNavigation() {
           active: route.name === 'panel',
           command: () => void router.push({ name: 'panel' }),
         },
-        { type: 'separator' },
+        {
+          id: 'separator',
+          label: 'Separator',
+          icon: '─',
+          active: route.name === 'separator',
+          command: () => void router.push({ name: 'separator' }),
+        },
+        { id: 'forms-header', label: 'Forms', type: 'header' },
         {
           id: 'button',
           label: 'Button',
           icon: '▭',
           active: route.name === 'button',
           command: () => void router.push({ name: 'button' }),
-        },
-        {
-          id: 'dialog',
-          label: 'Dialog',
-          icon: '▣',
-          active: route.name === 'dialog',
-          command: () => void router.push({ name: 'dialog' }),
-        },
-        {
-          id: 'prompt',
-          label: 'Prompt',
-          icon: '?',
-          active: route.name === 'prompt',
-          command: () => void router.push({ name: 'prompt' }),
         },
         {
           id: 'form-field',
@@ -169,6 +163,21 @@ export function useTopNavigation() {
           active: route.name === 'progress-bar',
           command: () => void router.push({ name: 'progress-bar' }),
         },
+        { id: 'data-feedback-header', label: 'Data & Feedback', type: 'header' },
+        {
+          id: 'dialog',
+          label: 'Dialog',
+          icon: '▣',
+          active: route.name === 'dialog',
+          command: () => void router.push({ name: 'dialog' }),
+        },
+        {
+          id: 'prompt',
+          label: 'Prompt',
+          icon: '?',
+          active: route.name === 'prompt',
+          command: () => void router.push({ name: 'prompt' }),
+        },
         {
           id: 'table',
           label: 'Table',
@@ -190,7 +199,7 @@ export function useTopNavigation() {
           active: route.name === 'toast',
           command: () => void router.push({ name: 'toast' }),
         },
-        { type: 'separator' },
+        { id: 'icons-header', label: 'Icons', type: 'header' },
         {
           id: 'icon',
           label: 'Icon',
@@ -215,6 +224,7 @@ export function useComponentNavigation() {
   const router = useRouter()
 
   return computed<CMenuEntry[]>(() => [
+    { id: 'layout-header', label: 'Layout & Menus', type: 'header' },
     {
       id: 'app-bar-menu',
       label: 'AppBar & Menu',
@@ -243,27 +253,20 @@ export function useComponentNavigation() {
       active: route.name === 'panel',
       command: () => void router.push({ name: 'panel' }),
     },
-    { type: 'separator' },
+    {
+      id: 'separator',
+      label: 'Separator',
+      icon: '─',
+      active: route.name === 'separator',
+      command: () => void router.push({ name: 'separator' }),
+    },
+    { id: 'forms-header', label: 'Forms', type: 'header' },
     {
       id: 'button',
       label: 'Button',
       icon: '▭',
       active: route.name === 'button',
       command: () => void router.push({ name: 'button' }),
-    },
-    {
-      id: 'dialog',
-      label: 'Dialog',
-      icon: '▣',
-      active: route.name === 'dialog',
-      command: () => void router.push({ name: 'dialog' }),
-    },
-    {
-      id: 'prompt',
-      label: 'Prompt',
-      icon: '?',
-      active: route.name === 'prompt',
-      command: () => void router.push({ name: 'prompt' }),
     },
     {
       id: 'form-field',
@@ -363,6 +366,21 @@ export function useComponentNavigation() {
       active: route.name === 'progress-bar',
       command: () => void router.push({ name: 'progress-bar' }),
     },
+    { id: 'data-feedback-header', label: 'Data & Feedback', type: 'header' },
+    {
+      id: 'dialog',
+      label: 'Dialog',
+      icon: '▣',
+      active: route.name === 'dialog',
+      command: () => void router.push({ name: 'dialog' }),
+    },
+    {
+      id: 'prompt',
+      label: 'Prompt',
+      icon: '?',
+      active: route.name === 'prompt',
+      command: () => void router.push({ name: 'prompt' }),
+    },
     {
       id: 'table',
       label: 'Table',
@@ -384,7 +402,7 @@ export function useComponentNavigation() {
       active: route.name === 'toast',
       command: () => void router.push({ name: 'toast' }),
     },
-    { type: 'separator' },
+    { id: 'icons-header', label: 'Icons', type: 'header' },
     {
       id: 'icon',
       label: 'Icon',

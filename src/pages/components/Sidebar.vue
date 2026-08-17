@@ -37,6 +37,79 @@ const navigation: CMenuEntry[] = [
   },
 ]
 
+const groupedNavigation: CMenuEntry[] = [
+  { label: 'Menus', type: 'header' },
+  { label: 'AppBar & Menu', icon: '▤' },
+  { label: 'Context Menu', icon: '⌖' },
+  { label: 'Sidebar', icon: '◧', active: true },
+  { label: 'Forms', type: 'header' },
+  { label: 'Input', icon: '⌨' },
+  { label: 'Select', icon: '▾' },
+  { label: 'Date Picker', icon: '◫' },
+]
+
+const styledNavigation: CMenuEntry[] = [
+  { label: 'Menus', type: 'header', class: 'primary-heading' },
+  { label: 'AppBar & Menu' },
+  { label: 'Sidebar' },
+  {
+    label: 'Forms',
+    type: 'header',
+    style: { color: '#8a3b12', background: '#fff2e8' },
+  },
+  { label: 'Input' },
+  { label: 'Select' },
+]
+
+const menuHeaderUsage = `<script setup>
+const navigation = [
+  { label: 'Menus', type: 'header' },
+  { label: 'AppBar & Menu', icon: '▤', url: '/components/app-bar-menu' },
+  { label: 'Context Menu', icon: '⌖', url: '/components/context-menu' },
+  { label: 'Sidebar', icon: '◧', url: '/components/sidebar', active: true },
+
+  { label: 'Forms', type: 'header' },
+  { label: 'Input', icon: '⌨', url: '/components/input' },
+  { label: 'Select', icon: '▾', url: '/components/select' },
+  { label: 'Date Picker', icon: '◫', url: '/components/date-picker' },
+]
+<\/script>
+
+<template>
+  <CMenu :items="navigation" orientation="vertical" />
+</template>`
+
+const menuHeaderStyleUsage = `<script setup>
+const navigation = [
+  { label: 'Menus', type: 'header', class: 'primary-heading' },
+  { label: 'AppBar & Menu' },
+  { label: 'Sidebar' },
+  {
+    label: 'Forms',
+    type: 'header',
+    style: { color: '#8a3b12', background: '#fff2e8' },
+  },
+  { label: 'Input' },
+  { label: 'Select' },
+]
+<\/script>
+
+<template>
+  <CMenu class="styled-menu" :items="navigation" />
+</template>
+
+<style scoped>
+.styled-menu {
+  --c-menu-header-color: #24527a;
+  --c-menu-header-background: #edf5fc;
+  --c-menu-header-padding: 7px 8px 4px;
+}
+
+.styled-menu :deep(.primary-heading) {
+  border-inline-start: 3px solid #286aa6;
+}
+</style>`
+
 const sidebarUsage = `<CSideBar
   v-model:collapsed="sidebarCollapsed"
   collapse-button
@@ -273,6 +346,88 @@ function recordSelection(event: CMenuSelectEvent) {
 
     <section class="example">
       <div class="description">
+        <h2>Menu headers</h2>
+        <p>
+          Add <code>{ label: '...', type: 'header' }</code> to divide a long vertical menu into
+          recognizable groups. Headers are visual labels rather than actions, so they are skipped
+          by keyboard navigation. They also support <code>hidden</code> for conditional groups.
+        </p>
+      </div>
+
+      <div class="preview header-preview">
+        <CSideBar width="230px" aria-label="Grouped component navigation">
+          <template #header><strong>Components</strong></template>
+          <CMenu
+            :items="groupedNavigation"
+            orientation="vertical"
+            aria-label="Grouped component menu"
+          />
+        </CSideBar>
+
+        <div class="placeholder">
+          <strong>Grouped navigation</strong>
+          <span>Headers separate related menu entries without becoming selectable items.</span>
+        </div>
+      </div>
+
+      <CCodeBlock class="code-sample" :code="menuHeaderUsage" />
+    </section>
+
+    <section class="example">
+      <div class="description">
+        <h2>Styling menu headers</h2>
+        <p>
+          Set header CSS variables on <code>CMenu</code> to style every heading consistently. For a
+          particular heading, add <code>class</code> or <code>style</code> to its data object. With
+          scoped CSS, use <code>:deep()</code> when targeting that class because the rendered header
+          belongs to <code>CMenu</code>.
+        </p>
+      </div>
+
+      <div class="styled-header-preview">
+        <CMenu class="styled-menu" :items="styledNavigation" aria-label="Styled menu headers" />
+      </div>
+
+      <dl class="property-list header-style-properties">
+        <div>
+          <dt><code>--c-menu-header-color</code></dt>
+          <dd>Heading text color.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-background</code></dt>
+          <dd>Heading background, including colors and gradients.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-padding</code></dt>
+          <dd>Inner spacing for each heading.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-horizontal-padding</code></dt>
+          <dd>Optional padding override when a header appears in a horizontal menu.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-font-size</code></dt>
+          <dd>Heading text size.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-font-weight</code></dt>
+          <dd>Heading text weight.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-letter-spacing</code></dt>
+          <dd>Spacing between heading characters.</dd>
+        </div>
+        <div>
+          <dt><code>--c-menu-header-text-transform</code></dt>
+          <dd>Text transformation such as <code>uppercase</code> or <code>none</code>.</dd>
+        </div>
+      </dl>
+
+      <CCodeBlock class="code-sample" :code="menuHeaderStyleUsage" />
+    </section>
+
+    <section class="example">
+      <div class="description">
         <h2>Placement</h2>
         <p>
           Use the default <code>placement="start"</code> for navigation before the main content and
@@ -407,6 +562,28 @@ function recordSelection(event: CMenuSelectEvent) {
     border: 1px solid var(--c-border-color, #d5d9df);
   }
 
+  .header-preview {
+    height: 300px;
+  }
+
+  .styled-header-preview {
+    width: min(100%, 320px);
+    padding: 5px;
+    margin-bottom: 8px;
+    background: var(--c-surface-color, #fff);
+    border: 1px solid var(--c-border-color, #d5d9df);
+  }
+
+  .styled-menu {
+    --c-menu-header-color: #24527a;
+    --c-menu-header-background: #edf5fc;
+    --c-menu-header-padding: 7px 8px 4px;
+
+    :deep(.primary-heading) {
+      border-inline-start: 3px solid #286aa6;
+    }
+  }
+
   .user {
     color: var(--c-muted-text-color, #626a75);
     font-size: 12px;
@@ -477,6 +654,10 @@ function recordSelection(event: CMenuSelectEvent) {
     dd {
       line-height: 1.45;
     }
+  }
+
+  .header-style-properties > div {
+    grid-template-columns: 260px minmax(0, 1fr);
   }
 
   .placement-preview {
