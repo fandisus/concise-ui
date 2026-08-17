@@ -19,6 +19,25 @@ It is designed for applications such as ERP, WMS, CRM, POS, finance, inventory, 
 
 The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 
+## Theming
+
+Concise UI uses inherited CSS custom properties. Override semantic variables globally on
+`:root` or locally on any ancestor; no theme provider or runtime configuration is required:
+
+```css
+:root {
+  --c-primary-color: #f4c430;
+  --c-primary-text-color: #241c00;
+  --c-primary-border-color: #c99a00;
+  --c-primary-hover-color: #e2b51f;
+  --c-primary-active-color: #cfa30f;
+}
+```
+
+Use `c-theme-light` and `c-theme-dark` to select neutral surfaces independently from the brand
+palette. The documentation application contains the complete semantic-variable reference and
+scoped-theme examples.
+
 ## Components
 
 ### Layout and menus

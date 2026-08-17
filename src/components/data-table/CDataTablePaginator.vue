@@ -169,7 +169,7 @@ function changePerPage(event: Event) {
       padding: 2px 22px 2px 6px;
       color: var(--c-text-color, #20242a);
       font: inherit;
-      background: var(--c-input-background, #fff);
+      background: var(--c-input-background, var(--c-surface-color, #fff));
       border: 1px solid var(--c-control-border-color, #bfc5ce);
       border-radius: var(--c-border-radius, 3px);
 

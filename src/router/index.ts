@@ -27,6 +27,11 @@ const router = createRouter({
           redirect: { name: 'app-bar-menu' },
         },
         {
+          path: 'theming',
+          name: 'theming',
+          component: () => import('@/pages/components/Theming.vue'),
+        },
+        {
           path: 'app-bar-menu',
           name: 'app-bar-menu',
           component: () => import('@/pages/components/AppBarMenu.vue'),

@@ -1,0 +1,121 @@
+:where(:root) {
+  color-scheme: light;
+
+  /* Neutral application surfaces: override these for light and dark schemes. */
+  --c-page-background-color: #f4f6f8;
+  --c-text-color: #20242a;
+  --c-muted-text-color: #626a75;
+  --c-surface-color: #fff;
+  --c-subtle-surface-color: #f7f8fa;
+  --c-input-background: var(--c-surface-color);
+  --c-border-color: #d5d9df;
+  --c-control-border-color: #bfc5ce;
+  --c-control-hover-border-color: #929aa6;
+  --c-hover-color: #eef1f5;
+  --c-active-color: #e1e5ea;
+  --c-placeholder-color: #7a828d;
+  --c-disabled-text-color: #8a9099;
+  --c-disabled-background-color: #f1f3f5;
+  --c-disabled-border-color: var(--c-border-color);
+  --c-readonly-background-color: var(--c-subtle-surface-color);
+  --c-progress-track-color: #e5e8ec;
+
+  /* Brand and interactive emphasis: independent from the neutral color scheme. */
+  --c-primary-color: #286aa6;
+  --c-primary-text-color: #fff;
+  --c-primary-border-color: #245f95;
+  --c-primary-hover-color: #245f95;
+  --c-primary-active-color: #1f5687;
+  --c-focus-color: #3578c6;
+  --c-selection-color: #dceafa;
+  --c-selection-text-color: #173f70;
+  --c-selection-subtle-color: #dceaf8;
+
+  /* Semantic status colors remain separate from the application brand. */
+  --c-info-color: #16869b;
+  --c-info-text-color: #fff;
+  --c-info-border-color: #117486;
+  --c-success-color: #2f7d32;
+  --c-success-text-color: #fff;
+  --c-success-border-color: #27692a;
+  --c-success-hover-color: #27692a;
+  --c-success-active-color: #205923;
+  --c-warning-color: #f0ad32;
+  --c-warning-text-color: #3d2a00;
+  --c-warning-border-color: #d7951d;
+  --c-warning-hover-color: #e3a025;
+  --c-warning-active-color: #cf8d18;
+  --c-danger-color: #b42318;
+  --c-danger-text-color: #fff;
+  --c-danger-border-color: #991b1b;
+  --c-danger-hover-color: #991b1b;
+  --c-danger-active-color: #7f1d1d;
+
+  /* Neutral component details that need coordinated light/dark values. */
+  --c-glyph-circle-background: var(--c-hover-color);
+  --c-glyph-circle-border-color: var(--c-border-color);
+  --c-table-border-color: var(--c-border-color);
+  --c-table-header-background: #eef1f5;
+  --c-table-row-hover-background: #f5f8fb;
+  --c-table-footer-background: var(--c-subtle-surface-color);
+  --c-table-frozen-background: var(--c-surface-color);
+  --c-data-table-loading-background: rgb(255 255 255 / 72%);
+}
+
+:where(.c-theme-light) {
+  color-scheme: light;
+  --c-page-background-color: #f4f6f8;
+  --c-text-color: #20242a;
+  --c-muted-text-color: #626a75;
+  --c-surface-color: #fff;
+  --c-subtle-surface-color: #f7f8fa;
+  --c-input-background: var(--c-surface-color);
+  --c-border-color: #d5d9df;
+  --c-control-border-color: #bfc5ce;
+  --c-control-hover-border-color: #929aa6;
+  --c-hover-color: #eef1f5;
+  --c-active-color: #e1e5ea;
+  --c-placeholder-color: #7a828d;
+  --c-disabled-text-color: #8a9099;
+  --c-disabled-background-color: #f1f3f5;
+  --c-disabled-border-color: var(--c-border-color);
+  --c-readonly-background-color: var(--c-subtle-surface-color);
+  --c-progress-track-color: #e5e8ec;
+  --c-glyph-circle-background: var(--c-hover-color);
+  --c-glyph-circle-border-color: var(--c-border-color);
+  --c-table-border-color: var(--c-border-color);
+  --c-table-header-background: #eef1f5;
+  --c-table-row-hover-background: #f5f8fb;
+  --c-table-footer-background: var(--c-subtle-surface-color);
+  --c-table-frozen-background: var(--c-surface-color);
+  --c-data-table-loading-background: rgb(255 255 255 / 72%);
+}
+
+:where(.c-theme-dark) {
+  color-scheme: dark;
+  --c-page-background-color: #15191e;
+  --c-text-color: #e6e9ed;
+  --c-muted-text-color: #a8b0bb;
+  --c-surface-color: #1d2229;
+  --c-subtle-surface-color: #252b33;
+  --c-input-background: #181d23;
+  --c-border-color: #3a424c;
+  --c-control-border-color: #4b5562;
+  --c-control-hover-border-color: #6d7886;
+  --c-hover-color: #2a313a;
+  --c-active-color: #343d47;
+  --c-placeholder-color: #8993a1;
+  --c-disabled-text-color: #737d89;
+  --c-disabled-background-color: #252b32;
+  --c-disabled-border-color: #39414b;
+  --c-readonly-background-color: #22282f;
+  --c-progress-track-color: #323a44;
+  --c-glyph-circle-background: var(--c-hover-color);
+  --c-glyph-circle-border-color: var(--c-border-color);
+  --c-table-border-color: var(--c-border-color);
+  --c-table-header-background: #292f38;
+  --c-table-row-hover-background: #252d36;
+  --c-table-footer-background: var(--c-subtle-surface-color);
+  --c-table-frozen-background: var(--c-surface-color);
+  --c-data-table-loading-background: rgb(29 34 41 / 78%);
+}

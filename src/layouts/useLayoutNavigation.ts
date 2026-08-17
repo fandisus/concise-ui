@@ -21,6 +21,13 @@ export function useTopNavigation() {
       icon: '▦',
       active: route.path.startsWith('/components'),
       children: [
+        {
+          id: 'theming',
+          label: 'Theming',
+          icon: '◐',
+          active: route.name === 'theming',
+          command: () => void router.push({ name: 'theming' }),
+        },
         { id: 'layout-header', label: 'Layout & Menus', type: 'header' },
         {
           id: 'app-bar-menu',
@@ -224,6 +231,13 @@ export function useComponentNavigation() {
   const router = useRouter()
 
   return computed<CMenuEntry[]>(() => [
+    {
+      id: 'theming',
+      label: 'Theming',
+      icon: '◐',
+      active: route.name === 'theming',
+      command: () => void router.push({ name: 'theming' }),
+    },
     { id: 'layout-header', label: 'Layout & Menus', type: 'header' },
     {
       id: 'app-bar-menu',

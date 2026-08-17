@@ -73,7 +73,7 @@ const checked = computed(() => Object.is(props.modelValue, props.value))
     margin: 1px 0 0;
     appearance: none;
     cursor: inherit;
-    background: var(--c-input-background, #fff);
+    background: var(--c-input-background, var(--c-surface-color, #fff));
     border: 1px solid var(--c-control-border-color, #bfc5ce);
     border-radius: 50%;
 
@@ -90,7 +90,7 @@ const checked = computed(() => Object.is(props.modelValue, props.value))
     }
 
     &:checked {
-      border-color: var(--c-primary-color, #286aa6);
+      border-color: var(--c-primary-border-color, var(--c-primary-color, #286aa6));
 
       &::after {
         display: block;

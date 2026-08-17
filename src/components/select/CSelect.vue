@@ -600,7 +600,7 @@ onBeforeUnmount(() => {
   font: inherit;
   line-height: 1.2;
   cursor: pointer;
-  background-color: var(--c-input-background, #fff);
+  background-color: var(--c-input-background, var(--c-surface-color, #fff));
   border: 1px solid var(--c-control-border-color, #bfc5ce);
   border-radius: var(--c-border-radius, 3px);
 

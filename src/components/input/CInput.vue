@@ -65,7 +65,7 @@ function updateValue(event: Event) {
   color: var(--c-text-color, #20242a);
   font: inherit;
   line-height: 1.2;
-  background: var(--c-input-background, #fff);
+  background: var(--c-input-background, var(--c-surface-color, #fff));
   border: 1px solid var(--c-control-border-color, #bfc5ce);
   border-radius: var(--c-border-radius, 3px);
 
@@ -92,7 +92,7 @@ function updateValue(event: Event) {
   }
 
   &:read-only:not(:disabled) {
-    background: var(--c-readonly-background-color, #f7f8fa);
+    background: var(--c-readonly-background-color, var(--c-subtle-surface-color, #f7f8fa));
   }
 
   &.is-invalid {

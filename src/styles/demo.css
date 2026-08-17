@@ -1,8 +1,8 @@
 :root {
-  color: #20242a;
+  color: var(--c-text-color, #20242a);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 13px;
-  background: #f4f6f8;
+  background: var(--c-page-background-color, #f4f6f8);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -36,7 +36,7 @@ textarea {
 
 .demo-layout__brand {
   padding: 0 8px 0 2px;
-  color: #20242a;
+  color: var(--c-text-color, #20242a);
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
@@ -67,33 +67,33 @@ textarea {
   justify-content: center;
   min-height: 30px;
   padding: 4px 10px;
-  color: #20242a;
+  color: var(--c-text-color, #20242a);
   font: inherit;
   font-weight: 600;
   line-height: 1.2;
   text-decoration: none;
   cursor: pointer;
-  background: #fff;
-  border: 1px solid #bfc5ce;
+  background: var(--c-surface-color, #fff);
+  border: 1px solid var(--c-control-border-color, #bfc5ce);
   border-radius: 3px;
 }
 
 .demo-button:hover {
-  background: #eef1f5;
+  background: var(--c-hover-color, #eef1f5);
 }
 
 .demo-button--primary {
-  color: #fff;
-  background: #286aa6;
-  border-color: #245f95;
+  color: var(--c-primary-text-color, #fff);
+  background: var(--c-primary-color, #286aa6);
+  border-color: var(--c-primary-border-color, #245f95);
 }
 
 .demo-button--primary:hover {
-  background: #245f95;
+  background: var(--c-primary-hover-color, #245f95);
 }
 
 .demo-button:focus-visible,
 .demo-layout__brand:focus-visible {
-  outline: 2px solid #3578c6;
+  outline: 2px solid var(--c-focus-color, #3578c6);
   outline-offset: 2px;
 }

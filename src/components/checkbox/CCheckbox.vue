@@ -120,7 +120,7 @@ function updateValue(event: Event) {
     margin: 1px 0 0;
     appearance: none;
     cursor: inherit;
-    background: var(--c-input-background, #fff);
+    background: var(--c-input-background, var(--c-surface-color, #fff));
     border: 1px solid var(--c-control-border-color, #bfc5ce);
     border-radius: 2px;
 
@@ -142,7 +142,7 @@ function updateValue(event: Event) {
       display: block;
       width: 4px;
       height: 8px;
-      border: solid #fff;
+      border: solid var(--c-primary-text-color, #fff);
       border-width: 0 2px 2px 0;
       transform: rotate(45deg);
     }
@@ -153,7 +153,7 @@ function updateValue(event: Event) {
       display: block;
       width: 8px;
       height: 2px;
-      background: #fff;
+      background: var(--c-primary-text-color, #fff);
     }
 
     &:focus-visible {
