@@ -170,6 +170,13 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'table' }),
         },
         {
+          id: 'data-table',
+          label: 'Data Table',
+          icon: '▥',
+          active: route.name === 'data-table',
+          command: () => void router.push({ name: 'data-table' }),
+        },
+        {
           id: 'toast',
           label: 'Toast',
           icon: '▣',
@@ -348,6 +355,13 @@ export function useComponentNavigation() {
       icon: '▦',
       active: route.name === 'table',
       command: () => void router.push({ name: 'table' }),
+    },
+    {
+      id: 'data-table',
+      label: 'Data Table',
+      icon: '▥',
+      active: route.name === 'data-table',
+      command: () => void router.push({ name: 'data-table' }),
     },
     {
       id: 'toast',

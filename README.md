@@ -41,6 +41,7 @@ The complete design direction is documented in [AGENTS.md](./AGENTS.md).
 ### Data display
 
 - `CTable`
+- `CDataTable`
 
 ### Form structure
 

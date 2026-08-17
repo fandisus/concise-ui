@@ -132,6 +132,11 @@ const router = createRouter({
           component: () => import('@/pages/components/Table.vue'),
         },
         {
+          path: 'data-table',
+          name: 'data-table',
+          component: () => import('@/pages/components/DataTable.vue'),
+        },
+        {
           path: 'toast',
           name: 'toast',
           component: () => import('@/pages/components/Toast.vue'),
