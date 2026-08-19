@@ -27,6 +27,7 @@ export { default as CSideBar } from './components/side-bar/CSideBar.vue'
 export { default as CTable } from './components/table/CTable.vue'
 export { default as CTextArea } from './components/text-area/CTextArea.vue'
 export { default as CToast } from './components/toast/CToast.vue'
+export { default as CTreeView } from './components/tree-view/CTreeView.vue'
 export { CPrompt } from './services/prompt/prompt'
 export { CPromptPlugin } from './services/prompt/plugin'
 export { CToastService } from './services/toast/toast'
@@ -93,6 +94,13 @@ export type {
   CToastPosition,
   CToastVariant,
 } from './components/toast/types'
+export type {
+  CTreeViewExpose,
+  CTreeViewItem,
+  CTreeViewSelectionChangeEvent,
+  CTreeViewSelectionClickEvent,
+  CTreeViewSelectionState,
+} from './components/tree-view/types'
 export type {
   CGlyphDisplay,
   CGlyphPresentationProps,

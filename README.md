@@ -74,6 +74,7 @@ scoped-theme examples.
 - `CPrompt` / `CPromptPlugin`
 - `CTable`
 - `CDataTable`
+- `CTreeView`
 - `CToast` / `CToastService` / `CToastPlugin`
 
 ### Icons

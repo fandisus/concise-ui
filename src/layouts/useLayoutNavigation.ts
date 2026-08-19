@@ -200,6 +200,13 @@ export function useTopNavigation() {
           command: () => void router.push({ name: 'data-table' }),
         },
         {
+          id: 'tree-view',
+          label: 'Tree View',
+          icon: 'T',
+          active: route.name === 'tree-view',
+          command: () => void router.push({ name: 'tree-view' }),
+        },
+        {
           id: 'toast',
           label: 'Toast',
           icon: '▣',
@@ -408,6 +415,13 @@ export function useComponentNavigation() {
       icon: '▥',
       active: route.name === 'data-table',
       command: () => void router.push({ name: 'data-table' }),
+    },
+    {
+      id: 'tree-view',
+      label: 'Tree View',
+      icon: 'T',
+      active: route.name === 'tree-view',
+      command: () => void router.push({ name: 'tree-view' }),
     },
     {
       id: 'toast',
