@@ -11,6 +11,7 @@ import type {
   CSelectValue,
   CSelectValueAccessor,
 } from '../select/types'
+import type { CSelectResolvedOption } from '../select/internal'
 import type { CMultiSelectModelValue } from './types'
 
 defineOptions({ inheritAttrs: false })
@@ -131,8 +132,8 @@ function valuesMatch(left: CSelectValue, right: CSelectValue) {
   )
 }
 
-const visibleOptions = computed(() =>
-  props.options.flatMap((source, index) => {
+const visibleOptions = computed<CSelectResolvedOption[]>(() =>
+  props.options.flatMap<CSelectResolvedOption>((source, index) => {
     if (props.optionLabel || props.optionValue) {
       const record = source as Record<string, unknown>
       if (record.hidden) return []
@@ -164,7 +165,14 @@ const visibleOptions = computed(() =>
       typeof option.value === 'object'
         ? `object:${objectKey(option.value)}`
         : `${typeof option.value}:${String(option.value)}:${index}`
-    return [{ ...option, key: valueKey }]
+    return [
+      {
+        key: valueKey,
+        label: option.label,
+        value: option.value,
+        disabled: Boolean(option.disabled),
+      },
+    ]
   }),
 )
 

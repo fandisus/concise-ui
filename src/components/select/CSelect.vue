@@ -5,6 +5,7 @@ import CButton from '../button/CButton.vue'
 import type { CFormControlSize } from '../form/types'
 import { useFormControl } from '../form/useFormControl'
 import CIcon from '../icon/CIcon.vue'
+import type { CSelectResolvedOption } from './internal'
 import type {
   CSelectKeyAccessor,
   CSelectLabelAccessor,
@@ -146,8 +147,8 @@ function valuesMatch(left: CSelectValue | null, right: CSelectValue | null) {
   )
 }
 
-const visibleOptions = computed(() =>
-  props.options.flatMap((source, index) => {
+const visibleOptions = computed<CSelectResolvedOption[]>(() =>
+  props.options.flatMap<CSelectResolvedOption>((source, index) => {
     if (props.optionLabel || props.optionValue) {
       const record = source as Record<string, unknown>
       if (record.hidden) return []
@@ -179,7 +180,14 @@ const visibleOptions = computed(() =>
       typeof option.value === 'object'
         ? `object:${objectKey(option.value)}`
         : `${typeof option.value}:${String(option.value)}:${index}`
-    return [{ ...option, key: valueKey }]
+    return [
+      {
+        key: valueKey,
+        label: option.label,
+        value: option.value,
+        disabled: Boolean(option.disabled),
+      },
+    ]
   }),
 )
 

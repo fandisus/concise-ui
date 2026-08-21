@@ -12,6 +12,7 @@ export default defineConfig(({ command }) => ({
     },
   },
   build: {
+    copyPublicDir: false,
     sourcemap: true,
     lib: {
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),

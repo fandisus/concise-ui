@@ -21,7 +21,7 @@ export const CToastPlugin: Plugin<[CToastPluginOptions?]> = {
     container.dataset.cToastHost = ''
     document.body.append(container)
 
-    const host = createVNode(CToastHost, options)
+    const host = createVNode(CToastHost, { ...options })
     host.appContext = app._context
     render(host, container)
   },

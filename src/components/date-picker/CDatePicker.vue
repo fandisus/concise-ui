@@ -103,7 +103,8 @@ const displayValue = computed(() => {
   if (!start && !end) return ''
   if (start && !end) return `${formatDisplayDate(start)} - ...`
   if (!start && end) return `... - ${formatDisplayDate(end)}`
-  return `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`
+  if (start && end) return `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`
+  return ''
 })
 const resolvedPlaceholder = computed(
   () => props.placeholder ?? (props.range ? 'Select date range' : 'Select date'),
