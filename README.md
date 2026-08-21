@@ -6,6 +6,10 @@ It is designed for applications such as ERP, WMS, CRM, POS, finance, inventory, 
 
 > Concise UI is currently under active development. Its public API may change before the first stable release.
 
+## Acknowledgements
+
+Concise-UI is designed and developed by its author with extensive assistance from OpenAI Codex and ChatGPT. Codex and ChatGPT contributed substantially to implementation, code review, testing, documentation, and development discussions.
+
 ## Design principles
 
 - High information density with compact controls and restrained spacing
