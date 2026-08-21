@@ -19,7 +19,13 @@ const componentNavigation = useComponentNavigation()
     <div class="demo-layout__workspace">
       <CSideBar width="220px" aria-label="Component navigation">
         <template #header>
-          <strong>Components</strong>
+          <RouterLink class="docs-brand" to="/" aria-label="Concise UI home">
+            <img src="/concise-ui-mark.png" alt="" width="30" height="30" />
+            <span>
+              <strong>concise-ui</strong>
+              <small>Component docs</small>
+            </span>
+          </RouterLink>
         </template>
 
         <CMenu
@@ -36,3 +42,44 @@ const componentNavigation = useComponentNavigation()
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.docs-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--c-text-color, #20242a);
+  text-decoration: none;
+  gap: 7px;
+
+  img {
+    flex: none;
+    object-fit: contain;
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  strong {
+    color: #0f172a;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+  }
+
+  small {
+    margin-top: 2px;
+    color: var(--c-muted-text-color, #626a75);
+    font-size: 10px;
+  }
+
+  &:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid var(--c-focus-color, #3578c6);
+    outline-offset: 2px;
+  }
+}
+</style>
