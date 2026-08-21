@@ -91,6 +91,7 @@ Components and their public types are exported from the package entry point:
 <script setup lang="ts">
 import { ref } from 'vue'
 import { CButton, CFormField, CInput, CProgressBar } from '@icfm/concise-ui'
+import '@icfm/concise-ui/style.css'
 
 const name = ref('')
 const progress = ref(35)
@@ -106,7 +107,9 @@ const progress = ref(35)
 </template>
 ```
 
-Component styling is authored as scoped SCSS and uses theme variables. The production build emits `dist/concise-ui.css` alongside the JavaScript bundles; applications must include that generated stylesheet. Theme variables can customize presentation without changing component behavior.
+Component styling is authored as scoped SCSS and uses theme variables. Import
+`@icfm/concise-ui/style.css` once in the application entry point. Theme variables can customize
+presentation without changing component behavior.
 
 ## Programmatic prompts
 

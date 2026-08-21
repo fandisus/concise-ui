@@ -240,6 +240,14 @@ const items = [
   />
 </template>`
 
+const expansionControlsUsage = `<CTreeView
+  :items="items"
+  item-label="name"
+  item-key="id"
+  expand-all-button
+  collapse-all-button
+/>`
+
 const selectionUsage = `<CTreeView
   ref="tree"
   :items="items"
@@ -501,6 +509,26 @@ const accessRightsMarkup = `<CTreeView
     </section>
 
     <section class="section">
+      <h2>Expand and collapse all</h2>
+      <p>
+        Add <code>expand-all-button</code>, <code>collapse-all-button</code>, or both to show compact
+        expansion controls above the tree. They affect only branches and do not change selection.
+        Both controls are hidden by default.
+      </p>
+      <div class="preview">
+        <CTreeView
+          :items="items"
+          item-label="name"
+          item-key="id"
+          expand-all-button
+          collapse-all-button
+          aria-label="Tree with expansion controls"
+        />
+      </div>
+      <CCodeBlock class="code-sample" :code="expansionControlsUsage" />
+    </section>
+
+    <section class="section">
       <h2>Programmatic selection</h2>
       <p>
         <code>setSelectionsBy(key, values)</code> uses exact <code>values.includes(item[key])</code>
@@ -619,6 +647,8 @@ const accessRightsMarkup = `<CTreeView
         <div><dt><code>item-key</code></dt><dd>Unique-key field used for internal UI state. Defaults to <code>key</code>.</dd></div>
         <div><dt><code>item-children</code></dt><dd>Child-array field. Defaults to <code>children</code>.</dd></div>
         <div><dt><code>selectable</code></dt><dd>Displays three-state selection checkboxes.</dd></div>
+        <div><dt><code>expand-all-button</code></dt><dd>Shows a button that expands every branch.</dd></div>
+        <div><dt><code>collapse-all-button</code></dt><dd>Shows a button that collapses every branch.</dd></div>
         <div><dt><code>*-icon</code></dt><dd>Customizes disclosure, folder, and file icons.</dd></div>
         <div><dt><code>#node</code></dt><dd>Replaces the default node icon and label. Receives <code>{ item, depth, isLeaf, expanded, selected, indeterminate }</code>.</dd></div>
         <div><dt><code>@selection-click</code></dt><dd>Emits <code>{ item, key, value, state }</code> for a direct checkbox interaction.</dd></div>

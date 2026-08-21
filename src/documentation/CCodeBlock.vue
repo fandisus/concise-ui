@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
 import Prism from 'prismjs'
+import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-typescript'
 
-type CCodeLanguage = 'markup' | 'css' | 'javascript' | 'typescript'
+type CCodeLanguage = 'markup' | 'bash' | 'css' | 'javascript' | 'typescript'
 
 const props = withDefaults(
   defineProps<{

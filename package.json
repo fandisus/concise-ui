@@ -1,6 +1,6 @@
 {
   "name": "@icfm/concise-ui",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A concise Vue 3 UI component library.",
   "type": "module",
   "files": [
@@ -15,6 +15,7 @@
       "import": "./dist/concise-ui.js",
       "require": "./dist/concise-ui.umd.cjs"
     },
+    "./style.css": "./dist/concise-ui.css",
     "./package.json": "./package.json"
   },
   "sideEffects": [

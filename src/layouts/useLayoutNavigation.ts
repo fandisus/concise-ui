@@ -22,6 +22,13 @@ export function useTopNavigation() {
       active: route.path.startsWith('/components'),
       children: [
         {
+          id: 'installation',
+          label: 'Installation',
+          icon: '↓',
+          active: route.name === 'installation',
+          command: () => void router.push({ name: 'installation' }),
+        },
+        {
           id: 'theming',
           label: 'Theming',
           icon: '◐',
@@ -238,6 +245,13 @@ export function useComponentNavigation() {
   const router = useRouter()
 
   return computed<CMenuEntry[]>(() => [
+    {
+      id: 'installation',
+      label: 'Installation',
+      icon: '↓',
+      active: route.name === 'installation',
+      command: () => void router.push({ name: 'installation' }),
+    },
     {
       id: 'theming',
       label: 'Theming',

@@ -40,6 +40,44 @@ describe('CTreeView', () => {
 
     expect(wrapper.get('.node-icon').text()).toBe('📁')
     expect(wrapper.get('.label').text()).toBe('Users')
+    expect(wrapper.find('.c-tree-view-controls').exists()).toBe(false)
+  })
+
+  it('optionally expands and collapses every branch', async () => {
+    const wrapper = mount(CTreeView, {
+      props: {
+        items,
+        itemLabel: 'name',
+        itemKey: 'id',
+        expandAllButton: true,
+        collapseAllButton: true,
+      },
+      attrs: {
+        class: 'application-tree',
+        'aria-label': 'Permission tree',
+      },
+    })
+
+    const controls = wrapper.get('.c-tree-view-controls')
+    const expandButton = controls.findAll('button').find((button) => button.text() === 'Expand all')
+    const collapseButton = controls
+      .findAll('button')
+      .find((button) => button.text() === 'Collapse all')
+
+    expect(expandButton).toBeDefined()
+    expect(collapseButton).toBeDefined()
+    expect(wrapper.get('[role="tree"]').classes()).toContain('application-tree')
+    expect(wrapper.get('[role="tree"]').attributes('aria-label')).toBe('Permission tree')
+
+    await expandButton?.trigger('click')
+    expect(wrapper.text()).toContain('Read users')
+    expect(wrapper.text()).toContain('Write users')
+
+    await collapseButton?.trigger('click')
+    expect(wrapper.text()).not.toContain('Read users')
+    expect(wrapper.text()).not.toContain('Write users')
+    expect(wrapper.emitted('selection-click')).toBeUndefined()
+    expect(wrapper.emitted('selection-change')).toBeUndefined()
   })
 
   it('renders a custom node slot for root and recursively nested nodes', async () => {

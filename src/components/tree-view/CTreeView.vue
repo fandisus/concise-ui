@@ -13,6 +13,8 @@ import type {
   CTreeViewSelectionState,
 } from './types'
 
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<{
     items?: CTreeViewItem[]
@@ -21,6 +23,8 @@ const props = withDefaults(
     itemKey?: string
     itemChildren?: string
     selectable?: boolean
+    expandAllButton?: boolean
+    collapseAllButton?: boolean
     expandedIcon?: string
     collapsedIcon?: string
     expandedFolderIcon?: string
@@ -34,6 +38,8 @@ const props = withDefaults(
     itemKey: 'key',
     itemChildren: 'children',
     selectable: false,
+    expandAllButton: false,
+    collapseAllButton: false,
     expandedIcon: '▼',
     collapsedIcon: '▶',
     expandedFolderIcon: '📂',
@@ -179,6 +185,18 @@ function toggleExpanded(key: unknown) {
   expandedKeys.value = next
 }
 
+function expandAll() {
+  expandedKeys.value = new Set(
+    flattenNodes(nodes.value)
+      .filter((node) => node.children.length > 0)
+      .map((node) => node.key),
+  )
+}
+
+function collapseAll() {
+  expandedKeys.value = new Set()
+}
+
 function setSubtreeSelection(node: CTreeViewResolvedNode, selected: boolean, keys: Set<unknown>) {
   if (selected) keys.add(node.key)
   else keys.delete(node.key)
@@ -236,31 +254,105 @@ defineExpose({ getSelections, getFlatSelections, setSelectionsBy })
 </script>
 
 <template>
-  <ul class="c-tree-view" role="tree" :aria-multiselectable="selectable || undefined">
-    <CTreeViewNode
-      v-for="node in nodes"
-      :key="node.renderKey"
-      :node="node"
-      :depth="0"
-      :expanded-keys="expandedKeys"
-      :selection-states="selectionStates"
-      :selectable="selectable"
-      :expanded-icon="expandedIcon"
-      :collapsed-icon="collapsedIcon"
-      :expanded-folder-icon="expandedFolderIcon"
-      :collapsed-folder-icon="collapsedFolderIcon"
-      :file-icon="fileIcon"
-      @toggle="toggleExpanded"
-      @select="selectNode"
+  <div
+    class="c-tree-view-container"
+    :class="{ 'has-controls': expandAllButton || collapseAllButton }"
+  >
+    <div
+      v-if="expandAllButton || collapseAllButton"
+      class="c-tree-view-controls"
+      role="toolbar"
+      aria-label="Tree expansion controls"
     >
-      <template v-if="$slots.node" #node="slotProps">
-        <slot name="node" v-bind="slotProps" />
-      </template>
-    </CTreeViewNode>
-  </ul>
+      <button v-if="expandAllButton" class="control" type="button" @click="expandAll">
+        Expand all
+      </button>
+      <button v-if="collapseAllButton" class="control" type="button" @click="collapseAll">
+        Collapse all
+      </button>
+    </div>
+    <ul
+      v-bind="$attrs"
+      class="c-tree-view"
+      role="tree"
+      :aria-multiselectable="selectable || undefined"
+    >
+      <CTreeViewNode
+        v-for="node in nodes"
+        :key="node.renderKey"
+        :node="node"
+        :depth="0"
+        :expanded-keys="expandedKeys"
+        :selection-states="selectionStates"
+        :selectable="selectable"
+        :expanded-icon="expandedIcon"
+        :collapsed-icon="collapsedIcon"
+        :expanded-folder-icon="expandedFolderIcon"
+        :collapsed-folder-icon="collapsedFolderIcon"
+        :file-icon="fileIcon"
+        @toggle="toggleExpanded"
+        @select="selectNode"
+      >
+        <template v-if="$slots.node" #node="slotProps">
+          <slot name="node" v-bind="slotProps" />
+        </template>
+      </CTreeViewNode>
+    </ul>
+  </div>
 </template>
 
 <style scoped lang="scss">
+.c-tree-view-container {
+  display: contents;
+
+  &.has-controls {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+}
+
+.c-tree-view-controls {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  gap: 4px;
+  background: var(--c-subtle-surface-color, #f7f8fa);
+  border: 1px solid var(--c-border-color, #d5d9df);
+  border-bottom: 0;
+  border-radius: var(--c-border-radius, 3px) var(--c-border-radius, 3px) 0 0;
+
+  .control {
+    min-height: 24px;
+    padding: 2px 8px;
+    color: var(--c-text-color, #20242a);
+    font: inherit;
+    cursor: pointer;
+    background: var(--c-surface-color, #fff);
+    border: 1px solid var(--c-control-border-color, #bfc5ce);
+    border-radius: var(--c-border-radius, 3px);
+
+    &:hover {
+      background: var(--c-hover-color, #eef1f5);
+      border-color: var(--c-control-hover-border-color, #929aa6);
+    }
+
+    &:active {
+      background: var(--c-active-color, #e1e5ea);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--c-focus-color, #3578c6);
+      outline-offset: 1px;
+    }
+  }
+
+  + .c-tree-view {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+}
+
 .c-tree-view {
   box-sizing: border-box;
   min-width: 0;
