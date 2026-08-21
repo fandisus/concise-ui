@@ -5,8 +5,11 @@ import CTreeViewNode from './CTreeViewNode.vue'
 import type { CTreeViewResolvedNode, CTreeViewSelectionMap } from './internal'
 import type {
   CTreeViewItem,
+  CTreeViewNodeSlotProps,
   CTreeViewSelectionChangeEvent,
   CTreeViewSelectionClickEvent,
+  CTreeViewSelectionMapper,
+  CTreeViewSelectionPredicate,
   CTreeViewSelectionState,
 } from './types'
 
@@ -42,6 +45,10 @@ const props = withDefaults(
 const emit = defineEmits<{
   'selection-click': [event: CTreeViewSelectionClickEvent]
   'selection-change': [event: CTreeViewSelectionChangeEvent]
+}>()
+
+defineSlots<{
+  node?(props: CTreeViewNodeSlotProps): unknown
 }>()
 
 const expandedKeys = ref<Set<unknown>>(new Set())
@@ -136,12 +143,17 @@ function getSelections() {
 
 function getFlatSelections(): CTreeViewItem[]
 function getFlatSelections(key: string): unknown[]
-function getFlatSelections(key?: string): CTreeViewItem[] | unknown[] {
+function getFlatSelections<TResult>(mapper: CTreeViewSelectionMapper<TResult>): TResult[]
+function getFlatSelections<TResult>(
+  transform?: string | CTreeViewSelectionMapper<TResult>,
+): CTreeViewItem[] | unknown[] | TResult[] {
   const selectedItems = flattenNodes(nodes.value)
     .filter((node) => selectionStates.value.get(node.key) === 'checked')
     .map((node) => node.item)
 
-  return key === undefined ? selectedItems : selectedItems.map((item) => item[key])
+  if (typeof transform === 'function') return selectedItems.map(transform)
+  if (typeof transform === 'string') return selectedItems.map((item) => item[transform])
+  return selectedItems
 }
 
 function emitSelectionChange() {
@@ -189,10 +201,19 @@ function selectNode(node: CTreeViewResolvedNode) {
   if (changed) emitSelectionChange()
 }
 
-function setSelectionsBy(key: string, values: unknown[]) {
+function setSelectionsBy(key: string, values: unknown[]): void
+function setSelectionsBy(predicate: CTreeViewSelectionPredicate): void
+function setSelectionsBy(
+  keyOrPredicate: string | CTreeViewSelectionPredicate,
+  values: unknown[] = [],
+) {
   const next = new Set<unknown>()
   flattenNodes(nodes.value).forEach((node) => {
-    if (values.includes(node.item[key])) next.add(node.key)
+    const selected =
+      typeof keyOrPredicate === 'function'
+        ? Boolean(keyOrPredicate(node.item))
+        : values.includes(node.item[keyOrPredicate])
+    if (selected) next.add(node.key)
   })
   applySelection(next)
 }
@@ -220,6 +241,7 @@ defineExpose({ getSelections, getFlatSelections, setSelectionsBy })
       v-for="node in nodes"
       :key="node.renderKey"
       :node="node"
+      :depth="0"
       :expanded-keys="expandedKeys"
       :selection-states="selectionStates"
       :selectable="selectable"
@@ -230,7 +252,11 @@ defineExpose({ getSelections, getFlatSelections, setSelectionsBy })
       :file-icon="fileIcon"
       @toggle="toggleExpanded"
       @select="selectNode"
-    />
+    >
+      <template v-if="$slots.node" #node="slotProps">
+        <slot name="node" v-bind="slotProps" />
+      </template>
+    </CTreeViewNode>
   </ul>
 </template>
 

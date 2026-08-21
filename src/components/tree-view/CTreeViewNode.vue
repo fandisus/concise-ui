@@ -4,9 +4,11 @@ import { computed } from 'vue'
 import CCheckbox from '../checkbox/CCheckbox.vue'
 import CIcon from '../icon/CIcon.vue'
 import type { CTreeViewResolvedNode, CTreeViewSelectionMap } from './internal'
+import type { CTreeViewNodeSlotProps } from './types'
 
 const props = defineProps<{
   node: CTreeViewResolvedNode
+  depth: number
   expandedKeys: Set<unknown>
   selectionStates: CTreeViewSelectionMap
   selectable: boolean
@@ -20,6 +22,10 @@ const props = defineProps<{
 const emit = defineEmits<{
   toggle: [key: unknown]
   select: [node: CTreeViewResolvedNode]
+}>()
+
+defineSlots<{
+  node?(props: CTreeViewNodeSlotProps): unknown
 }>()
 
 const hasChildren = computed(() => props.node.children.length > 0)
@@ -57,10 +63,22 @@ const indeterminate = computed(() => selectionState.value === 'indeterminate')
         @update:model-value="emit('select', node)"
       />
 
-      <CIcon class="node-icon" aria-hidden="true">{{
-        hasChildren ? (expanded ? expandedFolderIcon : collapsedFolderIcon) : fileIcon
-      }}</CIcon>
-      <span class="label">{{ node.label }}</span>
+      <div class="content">
+        <slot
+          name="node"
+          :item="node.item"
+          :depth="depth"
+          :is-leaf="!hasChildren"
+          :expanded="expanded"
+          :selected="checked"
+          :indeterminate="indeterminate"
+        >
+          <CIcon class="node-icon" aria-hidden="true">{{
+            hasChildren ? (expanded ? expandedFolderIcon : collapsedFolderIcon) : fileIcon
+          }}</CIcon>
+          <span class="label">{{ node.label }}</span>
+        </slot>
+      </div>
     </div>
 
     <ul v-if="expanded" class="children" role="group">
@@ -68,6 +86,7 @@ const indeterminate = computed(() => selectionState.value === 'indeterminate')
         v-for="child in node.children"
         :key="child.renderKey"
         :node="child"
+        :depth="depth + 1"
         :expanded-keys="expandedKeys"
         :selection-states="selectionStates"
         :selectable="selectable"
@@ -78,7 +97,11 @@ const indeterminate = computed(() => selectionState.value === 'indeterminate')
         :file-icon="fileIcon"
         @toggle="emit('toggle', $event)"
         @select="emit('select', $event)"
-      />
+      >
+        <template v-if="$slots.node" #node="slotProps">
+          <slot name="node" v-bind="slotProps" />
+        </template>
+      </CTreeViewNode>
     </ul>
   </li>
 </template>
@@ -135,13 +158,21 @@ const indeterminate = computed(() => selectionState.value === 'indeterminate')
     }
   }
 
-  .node-icon {
-    flex: none;
-  }
-
-  .label {
+  .content {
+    display: flex;
+    flex: 1;
+    align-items: center;
     min-width: 0;
-    overflow-wrap: anywhere;
+    gap: 5px;
+
+    .node-icon {
+      flex: none;
+    }
+
+    .label {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
   }
 
   .children {

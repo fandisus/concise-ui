@@ -97,8 +97,11 @@ export type {
 export type {
   CTreeViewExpose,
   CTreeViewItem,
+  CTreeViewNodeSlotProps,
   CTreeViewSelectionChangeEvent,
   CTreeViewSelectionClickEvent,
+  CTreeViewSelectionMapper,
+  CTreeViewSelectionPredicate,
   CTreeViewSelectionState,
 } from './components/tree-view/types'
 export type {
