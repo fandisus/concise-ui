@@ -1,6 +1,6 @@
 {
   "name": "@icfm/concise-ui",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A concise Vue 3 UI component library.",
   "type": "module",
   "files": [
