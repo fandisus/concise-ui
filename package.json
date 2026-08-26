@@ -34,6 +34,7 @@
   "scripts": {
     "dev": "vite",
     "build": "run-s type-check build-only build:types",
+    "build:site": "vite build --config vite.site.config.ts",
     "prepublishOnly": "npm run build",
     "preview": "vite preview",
     "test:unit": "vitest",
