@@ -4,6 +4,8 @@ Concise UI is a Vue 3 component framework for desktop-first enterprise and produ
 
 It is designed for applications such as ERP, WMS, CRM, POS, finance, inventory, administration, and other internal business systems. The goal is a compact, professional interface that displays information efficiently without imitating Bootstrap, Material Design, or old desktop software.
 
+Documentation: [concise-ui.icodeformoney.com](https://concise-ui.icodeformoney.com)
+
 > Concise UI is currently under active development. Its public API may change before the first stable release.
 
 ## Acknowledgements
