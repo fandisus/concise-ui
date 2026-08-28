@@ -88,6 +88,12 @@ const sizeUsage = `<CDialog v-model="open" size="small" />
 <!-- A custom width overrides the selected size. -->
 <CDialog v-model="open" width="42rem" />`
 
+const draggableUsage = `<!-- Dialogs are draggable by their header by default. -->
+<CDialog v-model="open" title="Reconcile payment" />
+
+<!-- Disable dragging when the position must remain fixed. -->
+<CDialog v-model="open" title="System notice" :draggable="false" />`
+
 const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer details">
   <CButton @click="historyDialogOpen = true">
     View history
@@ -106,7 +112,10 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
 <template>
   <article class="form-page">
     <header class="page-header">
-      <div><p class="category">Feedback</p><h1>Dialog</h1></div>
+      <div>
+        <p class="category">Feedback</p>
+        <h1>Dialog</h1>
+      </div>
       <p>
         <code>CDialog</code> presents focused tasks and decisions in a compact modal surface while
         keeping keyboard focus inside the dialog.
@@ -158,13 +167,9 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
         <CButton variant="danger" @click="deleteOpen = true">Delete customer</CButton>
       </div>
 
-      <CDialog
-        v-model="deleteOpen"
-        title="Delete customer"
-        width="380px"
-        :close-on-outside="false"
-      >
-        Delete <strong>{{ customerName }}</strong>? This operation cannot be undone.
+      <CDialog v-model="deleteOpen" title="Delete customer" width="380px" :close-on-outside="false">
+        Delete <strong>{{ customerName }}</strong
+        >? This operation cannot be undone.
 
         <template #footer="{ close }">
           <CButton @click="close">Cancel</CButton>
@@ -178,9 +183,9 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
     <section class="section">
       <h2>Header content and sizing</h2>
       <p>
-        The <code>header</code> slot replaces the plain title, and <code>actions</code> places compact
-        controls beside the close button. Supply <code>aria-label</code> when neither title nor a
-        meaningful header is present.
+        The <code>header</code> slot replaces the plain title, and <code>actions</code> places
+        compact controls beside the close button. Supply <code>aria-label</code> when neither title
+        nor a meaningful header is present.
       </p>
       <CCodeBlock class="code-sample" :code="headerUsage" />
     </section>
@@ -215,6 +220,17 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
       </CDialog>
 
       <CCodeBlock class="code-sample" :code="sizeUsage" />
+    </section>
+
+    <section class="section">
+      <h2>Draggable dialogs</h2>
+      <p>
+        Drag a dialog by its header to reposition it. Movement is constrained to the viewport, and
+        the dialog returns to the center the next time it opens. Header actions remain clickable.
+        Set <code>draggable="false"</code> to keep a dialog fixed. Full-screen dialogs cannot be
+        dragged.
+      </p>
+      <CCodeBlock class="code-sample" :code="draggableUsage" />
     </section>
 
     <section class="section">
@@ -253,23 +269,88 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
     <section class="section">
       <h2>Properties, events, methods, and slots</h2>
       <dl class="property-list">
-        <div><dt><code>model-value</code></dt><dd>Boolean visibility state used by <code>v-model</code>.</dd></div>
-        <div><dt><code>title</code></dt><dd>Optional header text that also labels the dialog.</dd></div>
-        <div><dt><code>aria-label</code></dt><dd>Accessible fallback name when no title or custom header is supplied.</dd></div>
-        <div><dt><code>closable</code></dt><dd>Shows the header close button. Defaults to <code>true</code>.</dd></div>
-        <div><dt><code>close-on-escape</code></dt><dd>Allows Escape to dismiss the dialog. Defaults to <code>true</code>.</dd></div>
-        <div><dt><code>close-on-outside</code></dt><dd>Allows backdrop clicks to dismiss the dialog. Defaults to <code>true</code>.</dd></div>
-        <div><dt><code>size</code></dt><dd><code>small</code> (360px), <code>medium</code> (480px), or <code>large</code> (720px).</dd></div>
-        <div><dt><code>full-screen</code></dt><dd>Expands the dialog surface to fill the viewport.</dd></div>
-        <div><dt><code>allow-overflow</code></dt><dd>Allows popups such as select lists to extend beyond the body instead of being clipped.</dd></div>
-        <div><dt><code>width</code></dt><dd>Optional CSS width such as <code>42rem</code> that overrides <code>size</code>.</dd></div>
-        <div><dt><code>teleport-to</code></dt><dd>Teleport selector or element. Defaults to <code>body</code>.</dd></div>
-        <div><dt><code>@close</code></dt><dd>Emits <code>close-button</code>, <code>escape</code>, <code>outside</code>, or <code>programmatic</code>.</dd></div>
-        <div><dt><code>close()</code></dt><dd>Exposed method for programmatic dismissal.</dd></div>
-        <div><dt><code>default</code></dt><dd>Dialog body; receives a <code>close()</code> callback.</dd></div>
-        <div><dt><code>header</code></dt><dd>Custom content replacing the plain title.</dd></div>
-        <div><dt><code>actions</code></dt><dd>Compact header actions; receives <code>close()</code>.</dd></div>
-        <div><dt><code>footer</code></dt><dd>Footer actions aligned to the end; receives <code>close()</code>.</dd></div>
+        <div>
+          <dt><code>model-value</code></dt>
+          <dd>Boolean visibility state used by <code>v-model</code>.</dd>
+        </div>
+        <div>
+          <dt><code>title</code></dt>
+          <dd>Optional header text that also labels the dialog.</dd>
+        </div>
+        <div>
+          <dt><code>aria-label</code></dt>
+          <dd>Accessible fallback name when no title or custom header is supplied.</dd>
+        </div>
+        <div>
+          <dt><code>closable</code></dt>
+          <dd>Shows the header close button. Defaults to <code>true</code>.</dd>
+        </div>
+        <div>
+          <dt><code>close-on-escape</code></dt>
+          <dd>Allows Escape to dismiss the dialog. Defaults to <code>true</code>.</dd>
+        </div>
+        <div>
+          <dt><code>close-on-outside</code></dt>
+          <dd>Allows backdrop clicks to dismiss the dialog. Defaults to <code>true</code>.</dd>
+        </div>
+        <div>
+          <dt><code>size</code></dt>
+          <dd>
+            <code>small</code> (360px), <code>medium</code> (480px), or <code>large</code> (720px).
+          </dd>
+        </div>
+        <div>
+          <dt><code>full-screen</code></dt>
+          <dd>Expands the dialog surface to fill the viewport.</dd>
+        </div>
+        <div>
+          <dt><code>draggable</code></dt>
+          <dd>
+            Allows dragging by the header. Defaults to <code>true</code> and is ignored in
+            full-screen mode.
+          </dd>
+        </div>
+        <div>
+          <dt><code>allow-overflow</code></dt>
+          <dd>
+            Allows popups such as select lists to extend beyond the body instead of being clipped.
+          </dd>
+        </div>
+        <div>
+          <dt><code>width</code></dt>
+          <dd>Optional CSS width such as <code>42rem</code> that overrides <code>size</code>.</dd>
+        </div>
+        <div>
+          <dt><code>teleport-to</code></dt>
+          <dd>Teleport selector or element. Defaults to <code>body</code>.</dd>
+        </div>
+        <div>
+          <dt><code>@close</code></dt>
+          <dd>
+            Emits <code>close-button</code>, <code>escape</code>, <code>outside</code>, or
+            <code>programmatic</code>.
+          </dd>
+        </div>
+        <div>
+          <dt><code>close()</code></dt>
+          <dd>Exposed method for programmatic dismissal.</dd>
+        </div>
+        <div>
+          <dt><code>default</code></dt>
+          <dd>Dialog body; receives a <code>close()</code> callback.</dd>
+        </div>
+        <div>
+          <dt><code>header</code></dt>
+          <dd>Custom content replacing the plain title.</dd>
+        </div>
+        <div>
+          <dt><code>actions</code></dt>
+          <dd>Compact header actions; receives <code>close()</code>.</dd>
+        </div>
+        <div>
+          <dt><code>footer</code></dt>
+          <dd>Footer actions aligned to the end; receives <code>close()</code>.</dd>
+        </div>
       </dl>
     </section>
   </article>

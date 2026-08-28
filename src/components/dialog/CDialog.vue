@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useId, useSlots, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
 
 import type { CDialogCloseEvent, CDialogCloseReason, CDialogSize } from './types'
 
@@ -14,6 +14,7 @@ const props = withDefaults(
     closeOnOutside?: boolean
     size?: CDialogSize
     fullScreen?: boolean
+    draggable?: boolean
     allowOverflow?: boolean
     width?: string
     teleportTo?: string | HTMLElement
@@ -26,6 +27,7 @@ const props = withDefaults(
     closeOnOutside: true,
     size: 'medium',
     fullScreen: false,
+    draggable: true,
     allowOverflow: false,
     width: undefined,
     teleportTo: 'body',
@@ -47,13 +49,111 @@ defineSlots<{
 
 const slots = useSlots()
 const dialogElement = ref<HTMLDialogElement | null>(null)
+const surfaceElement = ref<HTMLElement | null>(null)
+const position = ref({ x: 0, y: 0 })
+const isDragging = ref(false)
 const uid = useId()
 const titleId = `c-dialog-title-${uid}`
 const hasHeading = computed(() => Boolean(props.title || slots.header))
 const hasHeader = computed(() => hasHeading.value || Boolean(slots.actions) || props.closable)
-const dialogStyle = computed(() => ({ '--c-dialog-width': props.width }))
+const canDrag = computed(() => props.draggable && hasHeader.value && !props.fullScreen)
+const dialogStyle = computed(() => ({
+  '--c-dialog-width': props.width,
+  '--c-dialog-x': `${position.value.x}px`,
+  '--c-dialog-y': `${position.value.y}px`,
+}))
+
+interface DragState {
+  pointerId: number
+  startX: number
+  startY: number
+  originX: number
+  originY: number
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}
+
+let dragState: DragState | null = null
+
+function resetPosition() {
+  position.value = { x: 0, y: 0 }
+}
+
+function stopDragging(event?: PointerEvent) {
+  if (event && dragState?.pointerId !== event.pointerId) return
+  dragState = null
+  isDragging.value = false
+}
+
+function handleDragStart(event: PointerEvent) {
+  if (!canDrag.value || event.button !== 0 || !event.isPrimary) return
+
+  const target = event.target
+  if (
+    target instanceof Element &&
+    target.closest(
+      'button, a, input, select, textarea, [contenteditable]:not([contenteditable="false"]), [data-c-dialog-no-drag]',
+    )
+  ) {
+    return
+  }
+
+  const surface = surfaceElement.value
+  if (!surface) return
+
+  const rect = surface.getBoundingClientRect()
+  dragState = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    originX: position.value.x,
+    originY: position.value.y,
+    minX: position.value.x - rect.left,
+    maxX: position.value.x + window.innerWidth - rect.right,
+    minY: position.value.y - rect.top,
+    maxY: position.value.y + window.innerHeight - rect.bottom,
+  }
+  isDragging.value = true
+  const header = event.currentTarget as HTMLElement
+  header.setPointerCapture(event.pointerId)
+  event.preventDefault()
+}
+
+function handleDrag(event: PointerEvent) {
+  if (!dragState || dragState.pointerId !== event.pointerId) return
+
+  position.value = {
+    x: Math.min(
+      dragState.maxX,
+      Math.max(dragState.minX, dragState.originX + event.clientX - dragState.startX),
+    ),
+    y: Math.min(
+      dragState.maxY,
+      Math.max(dragState.minY, dragState.originY + event.clientY - dragState.startY),
+    ),
+  }
+}
+
+function keepInsideViewport() {
+  if (!open.value || !canDrag.value || !surfaceElement.value) return
+
+  const rect = surfaceElement.value.getBoundingClientRect()
+  let { x, y } = position.value
+
+  if (rect.left < 0) x -= rect.left
+  else if (rect.right > window.innerWidth) x -= rect.right - window.innerWidth
+
+  if (rect.top < 0) y -= rect.top
+  else if (rect.bottom > window.innerHeight) y -= rect.bottom - window.innerHeight
+
+  position.value = { x, y }
+}
 
 async function syncOpenState(shouldOpen: boolean) {
+  if (shouldOpen) resetPosition()
+  else stopDragging()
   await nextTick()
   const dialog = dialogElement.value
   if (!dialog) return
@@ -83,7 +183,20 @@ function handleBackdropClick(event: MouseEvent) {
 }
 
 watch(open, (value) => void syncOpenState(value))
-onMounted(() => void syncOpenState(open.value))
+watch(
+  () => props.fullScreen,
+  (value) => {
+    if (value) {
+      stopDragging()
+      resetPosition()
+    }
+  },
+)
+onMounted(() => {
+  window.addEventListener('resize', keepInsideViewport)
+  void syncOpenState(open.value)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', keepInsideViewport))
 
 defineExpose({ close })
 </script>
@@ -96,7 +209,12 @@ defineExpose({ close })
       class="c-dialog"
       :class="[
         `is-${size}`,
-        { 'is-full-screen': fullScreen, 'allows-overflow': allowOverflow },
+        {
+          'is-full-screen': fullScreen,
+          'is-draggable': canDrag,
+          'is-dragging': isDragging,
+          'allows-overflow': allowOverflow,
+        },
       ]"
       :style="dialogStyle"
       :aria-labelledby="hasHeading ? titleId : undefined"
@@ -104,8 +222,16 @@ defineExpose({ close })
       @cancel="handleCancel"
       @click="handleBackdropClick"
     >
-      <div class="surface">
-        <header v-if="hasHeader" class="header">
+      <div ref="surfaceElement" class="surface">
+        <header
+          v-if="hasHeader"
+          class="header"
+          @pointerdown="handleDragStart"
+          @pointermove="handleDrag"
+          @pointerup="stopDragging"
+          @pointercancel="stopDragging"
+          @lostpointercapture="stopDragging"
+        >
           <div v-if="hasHeading" :id="titleId" class="heading">
             <slot name="header">
               <div class="title">{{ title }}</div>
@@ -150,10 +276,11 @@ defineExpose({ close })
   padding: 0;
   overflow: visible;
   color: var(--c-text-color, #20242a);
-  font-family: var(--c-font-family, system-ui, -apple-system, "Segoe UI", sans-serif);
+  font-family: var(--c-font-family, system-ui, -apple-system, 'Segoe UI', sans-serif);
   font-size: var(--c-font-size, 13px);
   background: transparent;
   border: 0;
+  transform: translate(var(--c-dialog-x, 0), var(--c-dialog-y, 0));
 
   &.is-small {
     --c-dialog-default-width: 360px;
@@ -196,6 +323,16 @@ defineExpose({ close })
     min-height: 34px;
     justify-content: space-between;
     border-bottom: 1px solid var(--c-border-color, #d5d9df);
+  }
+
+  &.is-draggable .header {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  &.is-dragging .header {
+    cursor: grabbing;
   }
 
   .heading {
