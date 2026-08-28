@@ -7,7 +7,10 @@ import CCodeBlock from '@/documentation/CCodeBlock.vue'
 
 const editOpen = ref(false)
 const deleteOpen = ref(false)
+const headerOpen = ref(false)
 const sizedOpen = ref(false)
+const draggableOpen = ref(false)
+const fixedDialogOpen = ref(false)
 const stackedOpen = ref(false)
 const childDialogOpen = ref(false)
 const dialogSize = ref<CDialogSize>('medium')
@@ -32,80 +35,116 @@ function showSizedDialog(size: CDialogSize | 'full-screen') {
 
 const basicJavaScript = `const editOpen = ref(false)
 const customerName = ref('Northwind Traders')
+const customerEmail = ref('orders@northwind.example')
+const lastClose = ref('None')
+
+function recordClose(event) {
+  lastClose.value = event.reason
+}
 
 function saveCustomer(close) {
-  saveRecord(customerName.value)
   close()
 }`
 
-const basicUsage = `<CButton @click="editOpen = true">Edit customer</CButton>
+const basicUsage = `<div class="actions-row">
+  <CButton variant="primary" @click="editOpen = true">Edit customer</CButton>
+  <span>Last close reason: {{ lastClose }}</span>
+</div>
 
-<CDialog v-model="editOpen" title="Edit customer">
-  <CFormField label="Customer name">
-    <CInput v-model="customerName" autofocus />
-  </CFormField>
+<CDialog v-model="editOpen" title="Edit customer" @close="recordClose">
+  <div class="dialog-form">
+    <CFormField label="Customer name">
+      <CInput v-model="customerName" autofocus />
+    </CFormField>
+    <CFormField label="Contact email">
+      <CInput v-model="customerEmail" type="email" />
+    </CFormField>
+  </div>
 
   <template #footer="{ close }">
     <CButton @click="close">Cancel</CButton>
-    <CButton variant="primary" @click="saveCustomer(close)">
-      Save
-    </CButton>
+    <CButton variant="primary" @click="saveCustomer(close)">Save</CButton>
   </template>
 </CDialog>`
 
-const confirmationUsage = `<CDialog
+const confirmationUsage = `<CButton variant="danger" @click="deleteOpen = true">Delete customer</CButton>
+
+<CDialog
   v-model="deleteOpen"
   title="Delete customer"
   width="380px"
   :close-on-outside="false"
 >
-  This operation cannot be undone.
+  Delete <strong>{{ customerName }}</strong>? This operation cannot be undone.
 
   <template #footer="{ close }">
     <CButton @click="close">Cancel</CButton>
-    <CButton variant="danger" @click="deleteCustomer">
-      Delete
-    </CButton>
+    <CButton variant="danger" @click="deleteOpen = false">Delete</CButton>
   </template>
 </CDialog>`
 
-const headerUsage = `<CDialog v-model="open">
-  <template #header>
-    Importing purchase orders
-  </template>
+const headerUsage = `<CButton @click="headerOpen = true">Import purchase orders</CButton>
+
+<CDialog v-model="headerOpen">
+  <template #header>Importing purchase orders</template>
   <template #actions="{ close }">
     <CButton size="small" @click="close">Stop</CButton>
   </template>
 
-  <!-- Dialog content -->
+  42 purchase orders are ready to import.
 </CDialog>`
 
-const sizeUsage = `<CDialog v-model="open" size="small" />
-<CDialog v-model="open" size="medium" />
-<CDialog v-model="open" size="large" />
-<CDialog v-model="open" full-screen />
+const sizeUsage = `<div class="size-actions">
+  <CButton size="small" @click="showSizedDialog('small')">Small</CButton>
+  <CButton size="small" @click="showSizedDialog('medium')">Medium</CButton>
+  <CButton size="small" @click="showSizedDialog('large')">Large</CButton>
+  <CButton size="small" @click="showSizedDialog('full-screen')">Full screen</CButton>
+</div>
 
-<!-- A custom width overrides the selected size. -->
-<CDialog v-model="open" width="42rem" />`
+<CDialog
+  v-model="sizedOpen"
+  :title="dialogFullScreen ? 'Full-screen workspace' : \`\${dialogSize} dialog\`"
+  :size="dialogSize"
+  :full-screen="dialogFullScreen"
+>
+  This live example demonstrates the selected dialog presentation.
+  <template #footer="{ close }">
+    <CButton @click="close">Close</CButton>
+  </template>
+</CDialog>`
 
-const draggableUsage = `<!-- Dialogs are draggable by their header by default. -->
-<CDialog v-model="open" title="Reconcile payment" />
+const draggableUsage = `<div class="size-actions">
+  <CButton @click="draggableOpen = true">Open draggable dialog</CButton>
+  <CButton @click="fixedDialogOpen = true">Open fixed dialog</CButton>
+</div>
 
-<!-- Disable dragging when the position must remain fixed. -->
-<CDialog v-model="open" title="System notice" :draggable="false" />`
+<CDialog v-model="draggableOpen" title="Reconcile payment">
+  Drag this dialog by its header.
+</CDialog>
 
-const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer details">
-  <CButton @click="historyDialogOpen = true">
-    View history
-  </CButton>
+<CDialog v-model="fixedDialogOpen" title="System notice" :draggable="false">
+  This dialog remains centered.
+</CDialog>`
 
-  <CDialog v-model="historyDialogOpen" title="Customer history" size="small">
-    The newest dialog remains interactive above its parent.
+const stackedUsage = `<CButton @click="stackedOpen = true">Open customer dialog</CButton>
+
+<CDialog v-model="stackedOpen" title="Customer details">
+  <p><strong>Northwind Traders</strong></p>
+  <p>Account status: Active</p>
+  <CButton @click="childDialogOpen = true">View account history</CButton>
+
+  <CDialog v-model="childDialogOpen" title="Account history" size="small">
+    <p>12 Aug 2026 — Contact email updated</p>
+    <p>04 Aug 2026 — Credit limit reviewed</p>
 
     <template #footer="{ close }">
       <CButton @click="close">Return to customer</CButton>
     </template>
   </CDialog>
+
+  <template #footer="{ close }">
+    <CButton @click="close">Close customer</CButton>
+  </template>
 </CDialog>`
 </script>
 
@@ -181,12 +220,25 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
     </section>
 
     <section class="section">
-      <h2>Header content and sizing</h2>
+      <h2>Header content and actions</h2>
       <p>
         The <code>header</code> slot replaces the plain title, and <code>actions</code> places
         compact controls beside the close button. Supply <code>aria-label</code> when neither title
         nor a meaningful header is present.
       </p>
+      <div class="preview">
+        <CButton @click="headerOpen = true">Import purchase orders</CButton>
+      </div>
+
+      <CDialog v-model="headerOpen">
+        <template #header>Importing purchase orders</template>
+        <template #actions="{ close }">
+          <CButton size="small" @click="close">Stop</CButton>
+        </template>
+
+        42 purchase orders are ready to import.
+      </CDialog>
+
       <CCodeBlock class="code-sample" :code="headerUsage" />
     </section>
 
@@ -195,8 +247,7 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
       <p>
         Use <code>small</code> for short decisions, <code>medium</code> for ordinary forms, and
         <code>large</code> for denser tasks. <code>full-screen</code> uses the entire viewport for
-        workspace-like dialogs. A custom <code>width</code> overrides the selected size while still
-        respecting viewport boundaries.
+        workspace-like dialogs.
       </p>
       <div class="preview">
         <div class="size-actions">
@@ -230,6 +281,21 @@ const stackedUsage = `<CDialog v-model="customerDialogOpen" title="Customer deta
         Set <code>draggable="false"</code> to keep a dialog fixed. Full-screen dialogs cannot be
         dragged.
       </p>
+      <div class="preview">
+        <div class="size-actions">
+          <CButton @click="draggableOpen = true">Open draggable dialog</CButton>
+          <CButton @click="fixedDialogOpen = true">Open fixed dialog</CButton>
+        </div>
+      </div>
+
+      <CDialog v-model="draggableOpen" title="Reconcile payment">
+        Drag this dialog by its header.
+      </CDialog>
+
+      <CDialog v-model="fixedDialogOpen" title="System notice" :draggable="false">
+        This dialog remains centered.
+      </CDialog>
+
       <CCodeBlock class="code-sample" :code="draggableUsage" />
     </section>
 
