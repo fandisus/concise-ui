@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
 
+import { activateDialog, removeDialog, isActiveDialog } from './stack'
+
 import type { CDialogCloseEvent, CDialogCloseReason, CDialogSize } from './types'
 
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
+    modal?: boolean
     title?: string
     ariaLabel?: string
     closable?: boolean
@@ -20,6 +23,7 @@ const props = withDefaults(
     teleportTo?: string | HTMLElement
   }>(),
   {
+    modal: true,
     title: undefined,
     ariaLabel: 'Dialog',
     closable: true,
@@ -158,19 +162,38 @@ async function syncOpenState(shouldOpen: boolean) {
   const dialog = dialogElement.value
   if (!dialog) return
 
-  if (shouldOpen && !dialog.open) dialog.showModal()
-  else if (!shouldOpen && dialog.open) dialog.close()
+  if (shouldOpen && !dialog.open) {
+    if (props.modal) dialog.showModal()
+    else dialog.show()
+    bringToFront()
+  } else if (!shouldOpen && dialog.open) dialog.close()
 }
 
 function close(reason: CDialogCloseReason = 'programmatic') {
   if (!open.value) return
   open.value = false
   dialogElement.value?.close()
+  if (dialogElement.value) removeDialog(dialogElement.value)
   emit('close', { reason })
 }
 
 function closeDialog() {
   close()
+}
+
+function bringToFront() {
+  const dialog = dialogElement.value
+  if (dialog) dialog.style.zIndex = String(activateDialog(dialog))
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  const dialog = dialogElement.value
+  if (event.defaultPrevented || props.modal || !open.value || !dialog || !isActiveDialog(dialog))
+    return
+  if (event.key === 'Escape' && props.closeOnEscape) {
+    event.preventDefault()
+    close('escape')
+  }
 }
 
 function handleCancel(event: Event) {
@@ -194,9 +217,14 @@ watch(
 )
 onMounted(() => {
   window.addEventListener('resize', keepInsideViewport)
+  document.addEventListener('keydown', handleKeydown)
   void syncOpenState(open.value)
 })
-onBeforeUnmount(() => window.removeEventListener('resize', keepInsideViewport))
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', keepInsideViewport)
+  document.removeEventListener('keydown', handleKeydown)
+  if (dialogElement.value) removeDialog(dialogElement.value)
+})
 
 defineExpose({ close })
 </script>
@@ -211,6 +239,7 @@ defineExpose({ close })
         `is-${size}`,
         {
           'is-full-screen': fullScreen,
+          'is-non-modal': !modal,
           'is-draggable': canDrag,
           'is-dragging': isDragging,
           'allows-overflow': allowOverflow,
@@ -219,6 +248,8 @@ defineExpose({ close })
       :style="dialogStyle"
       :aria-labelledby="hasHeading ? titleId : undefined"
       :aria-label="hasHeading ? undefined : ariaLabel"
+      @pointerdown="bringToFront"
+      @focusin="bringToFront"
       @cancel="handleCancel"
       @click="handleBackdropClick"
     >
@@ -281,6 +312,11 @@ defineExpose({ close })
   background: transparent;
   border: 0;
   transform: translate(var(--c-dialog-x, 0), var(--c-dialog-y, 0));
+
+  &.is-non-modal {
+    position: fixed;
+    inset: 0;
+  }
 
   &.is-small {
     --c-dialog-default-width: 360px;

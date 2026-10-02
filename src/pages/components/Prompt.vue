@@ -6,7 +6,8 @@ import CCodeBlock from '@/documentation/CCodeBlock.vue'
 
 const lastResult = ref('None')
 const serverOutput = 'Order: SO-1042\nStatus: Ready\nWarehouse: Central Warehouse'
-const hardcodedInFrontEndHtml = '<p><strong>Review the order</strong> before saving.</p><ul><li>Check quantities.</li><li>Confirm the warehouse.</li></ul>'
+const hardcodedInFrontEndHtml =
+  '<p><strong>Review the order</strong> before saving.</p><ul><li>Check quantities.</li><li>Confirm the warehouse.</li></ul>'
 
 const warehouses = [
   { id: 1, name: 'Central Warehouse', code: 'CTR' },
@@ -78,6 +79,32 @@ async function chooseColor() {
   })
   lastResult.value = color === null ? 'Selection cancelled' : `Color: ${color}`
 }
+
+function showMultipleMessages() {
+  void CPrompt.message({
+    title: 'Order details',
+    message: 'Order SO-1042 is ready.',
+    instanceMode: 'multiple',
+    icon: null,
+  })
+  void CPrompt.info({ title: 'Warehouse', message: 'Central Warehouse', instanceMode: 'multiple' })
+}
+
+const multipleUsage = `// Do not await the first call when opening messages together.
+const orderClosed = CPrompt.message({
+  title: 'Order details',
+  message: 'Order SO-1042 is ready.',
+  instanceMode: 'multiple',
+  icon: null,
+})
+
+const warehouseClosed = CPrompt.info({
+  title: 'Warehouse',
+  message: 'Central Warehouse',
+  instanceMode: 'multiple',
+})
+
+await Promise.all([orderClosed, warehouseClosed])`
 
 const installUsage = `import { createApp } from 'vue'
 import { CPromptPlugin } from '@icfm/concise-ui'
@@ -153,10 +180,13 @@ const color = await CPrompt.select({
 <template>
   <article class="form-page">
     <header class="page-header">
-      <div><p class="category">Feedback</p><h1>Prompt</h1></div>
+      <div>
+        <p class="category">Feedback</p>
+        <h1>Prompt</h1>
+      </div>
       <p>
-        <code>CPrompt</code> provides queued, promise-based messages, confirmations, text input,
-        and searchable selection without placing a host component in the application template.
+        <code>CPrompt</code> provides queued, promise-based messages, confirmations, text input, and
+        searchable selection without placing a host component in the application template.
       </p>
     </header>
     <CSeparator />
@@ -166,7 +196,8 @@ const color = await CPrompt.select({
       <p>
         Install <code>CPromptPlugin</code> once. It creates the internal prompt host automatically;
         no <code>CPromptHost</code> markup is required in <code>App.vue</code>. Calls made while
-        another prompt is open wait in a queue.
+        another prompt is open wait in a queue by default. Messages with
+        <code>instanceMode: 'multiple'</code> open independently.
       </p>
       <CCodeBlock class="code-sample" :code="installUsage" language="javascript" />
     </section>
@@ -180,10 +211,19 @@ const color = await CPrompt.select({
       </p>
       <div class="preview">
         <div class="actions">
-          <CButton size="small" @click="CPrompt.info({ message: 'The report is ready.' })">Info</CButton>
-          <CButton size="small" variant="success" @click="CPrompt.success({ message: 'Record saved.' })">Success</CButton>
+          <CButton size="small" @click="CPrompt.info({ message: 'The report is ready.' })"
+            >Info</CButton
+          >
+          <CButton
+            size="small"
+            variant="success"
+            @click="CPrompt.success({ message: 'Record saved.' })"
+            >Success</CButton
+          >
           <CButton size="small" variant="warning" @click="showMessage">Warning</CButton>
-          <CButton size="small" variant="danger" @click="CPrompt.error({ message: 'Save failed.' })">Error</CButton>
+          <CButton size="small" variant="danger" @click="CPrompt.error({ message: 'Save failed.' })"
+            >Error</CButton
+          >
           <CButton size="small" @click="showPreformattedMessage">Preformatted text</CButton>
           <CButton size="small" @click="showHtmlMessage">Trusted HTML</CButton>
         </div>
@@ -197,12 +237,31 @@ const color = await CPrompt.select({
     </section>
 
     <section class="section">
+      <h2>Multiple messages and optional icons</h2>
+      <p>
+        Message methods default to <code>instanceMode: 'single'</code>, preserving the modal queue.
+        Use <code>instanceMode: 'multiple'</code> for independent, non-modal, draggable messages.
+        Each promise resolves when its own message closes. Click or focus a box to bring it forward;
+        Escape closes only the active box. Queued modal prompts block interaction with these boxes
+        until dismissed.
+      </p>
+      <p>
+        Set <code>icon: null</code> to hide the icon and its space. Omit <code>icon</code> to keep
+        the default, or supply a string for a custom icon. This also works with semantic messages.
+      </p>
+      <div class="preview"><CButton @click="showMultipleMessages">Open two messages</CButton></div>
+      <CCodeBlock class="code-sample" :code="multipleUsage" language="javascript" />
+    </section>
+
+    <section class="section">
       <h2>Confirmation</h2>
       <p>
         <code>confirm()</code> resolves to <code>true</code> after confirmation and
         <code>false</code> after cancellation or dismissal.
       </p>
-      <div class="preview"><CButton variant="danger" @click="confirmDelete">Confirm deletion</CButton></div>
+      <div class="preview">
+        <CButton variant="danger" @click="confirmDelete">Confirm deletion</CButton>
+      </div>
       <CCodeBlock class="code-sample" :code="confirmUsage" language="javascript" />
     </section>
 
@@ -236,20 +295,43 @@ const color = await CPrompt.select({
     <section class="section">
       <h2>Methods and results</h2>
       <dl class="property-list">
-        <div><dt><code>info()</code></dt><dd>Semantic informational message; resolves after acknowledgement.</dd></div>
-        <div><dt><code>success()</code></dt><dd>Semantic success message; resolves after acknowledgement.</dd></div>
-        <div><dt><code>warning()</code></dt><dd>Semantic warning message; resolves after acknowledgement.</dd></div>
-        <div><dt><code>error()</code></dt><dd>Semantic error message; resolves after acknowledgement.</dd></div>
-        <div><dt><code>message()</code></dt><dd>Neutral, preformatted, or trusted-HTML message; resolves after acknowledgement.</dd></div>
-        <div><dt><code>confirm()</code></dt><dd>Resolves to a boolean.</dd></div>
-        <div><dt><code>input()</code></dt><dd>Resolves to a string or <code>null</code>.</dd></div>
-        <div><dt><code>select()</code></dt><dd>Resolves to the selected string/object or <code>null</code>.</dd></div>
+        <div>
+          <dt><code>info()</code></dt>
+          <dd>Semantic informational message; resolves after acknowledgement.</dd>
+        </div>
+        <div>
+          <dt><code>success()</code></dt>
+          <dd>Semantic success message; resolves after acknowledgement.</dd>
+        </div>
+        <div>
+          <dt><code>warning()</code></dt>
+          <dd>Semantic warning message; resolves after acknowledgement.</dd>
+        </div>
+        <div>
+          <dt><code>error()</code></dt>
+          <dd>Semantic error message; resolves after acknowledgement.</dd>
+        </div>
+        <div>
+          <dt><code>message()</code></dt>
+          <dd>Neutral, preformatted, or trusted-HTML message; resolves after acknowledgement.</dd>
+        </div>
+        <div>
+          <dt><code>confirm()</code></dt>
+          <dd>Resolves to a boolean.</dd>
+        </div>
+        <div>
+          <dt><code>input()</code></dt>
+          <dd>Resolves to a string or <code>null</code>.</dd>
+        </div>
+        <div>
+          <dt><code>select()</code></dt>
+          <dd>Resolves to the selected string/object or <code>null</code>.</dd>
+        </div>
       </dl>
       <p class="reference-note">
         All methods accept optional <code>title</code>, <code>icon</code>,
         <code>confirmLabel</code>, <code>size</code>, and <code>width</code> fields. Confirmation,
-        input, and selection also accept <code>cancelLabel</code> and
-        <code>confirmVariant</code>.
+        input, and selection also accept <code>cancelLabel</code> and <code>confirmVariant</code>.
       </p>
     </section>
   </article>

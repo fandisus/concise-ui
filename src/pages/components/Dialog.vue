@@ -370,6 +370,14 @@ const stackedUsage = `<CButton @click="stackedOpen = true">Open customer dialog<
           <dd>Expands the dialog surface to fill the viewport.</dd>
         </div>
         <div>
+          <dt><code>modal</code></dt>
+          <dd>
+            Defaults to <code>true</code>. Set to <code>false</code> to allow interaction with the
+            page. Clicking or focusing a box brings it forward; Escape closes only the active
+            dialog.
+          </dd>
+        </div>
+        <div>
           <dt><code>draggable</code></dt>
           <dd>
             Allows dragging by the header. Defaults to <code>true</code> and is ignored in

@@ -3,13 +3,14 @@ import type { CDialogSize } from '../../components/dialog/types'
 
 export interface CPromptBaseOptions {
   title?: string
-  icon?: string
+  icon?: string | null
   confirmLabel?: string
   size?: CDialogSize
   width?: string
 }
 
 export interface CPromptMessageOptions extends CPromptBaseOptions {
+  instanceMode?: 'single' | 'multiple'
   message?: string
   preformatted?: boolean
   unsafeHtml?: string
