@@ -5,6 +5,8 @@ import { CButton, CPrompt, CSeparator } from '@/index'
 import CCodeBlock from '@/documentation/CCodeBlock.vue'
 
 const lastResult = ref('None')
+const serverOutput = 'Order: SO-1042\nStatus: Ready\nWarehouse: Central Warehouse'
+const hardcodedInFrontEndHtml = '<p><strong>Review the order</strong> before saving.</p><ul><li>Check quantities.</li><li>Confirm the warehouse.</li></ul>'
 
 const warehouses = [
   { id: 1, name: 'Central Warehouse', code: 'CTR' },
@@ -18,6 +20,22 @@ async function showMessage() {
     message: 'The order exceeds the customer’s available credit.',
   })
   lastResult.value = 'Warning acknowledged'
+}
+
+async function showPreformattedMessage() {
+  await CPrompt.message({
+    title: 'Server response',
+    message: serverOutput,
+    icon: 'ⓘ',
+    preformatted: true,
+  })
+}
+
+async function showHtmlMessage() {
+  await CPrompt.message({
+    title: 'How to use this page',
+    unsafeHtml: hardcodedInFrontEndHtml,
+  })
 }
 
 async function confirmDelete() {
@@ -69,17 +87,27 @@ createApp(App)
   .use(CPromptPlugin)
   .mount('#app')`
 
-const messageUsage = `await CPrompt.warning({
+const messageUsage = `await CPrompt.info({ message: 'The report is ready.' })
+
+await CPrompt.success({ message: 'Record saved.' })
+
+await CPrompt.warning({
   title: 'Insufficient credit',
-  message: 'The order exceeds the available credit.',
+  message: 'The order exceeds the customer’s available credit.',
 })
+
+await CPrompt.error({ message: 'Save failed.' })
+
+const serverOutput = 'Order: SO-1042\\nStatus: Ready\\nWarehouse: Central Warehouse'
 
 await CPrompt.message({
   title: 'Server response',
   message: serverOutput,
-  icon: '😘',
+  icon: 'ⓘ',
   preformatted: true,
 })
+
+const hardcodedInFrontEndHtml = '<p><strong>Review the order</strong> before saving.</p><ul><li>Check quantities.</li><li>Confirm the warehouse.</li></ul>'
 
 await CPrompt.message({
   title: 'How to use this page',
@@ -156,6 +184,8 @@ const color = await CPrompt.select({
           <CButton size="small" variant="success" @click="CPrompt.success({ message: 'Record saved.' })">Success</CButton>
           <CButton size="small" variant="warning" @click="showMessage">Warning</CButton>
           <CButton size="small" variant="danger" @click="CPrompt.error({ message: 'Save failed.' })">Error</CButton>
+          <CButton size="small" @click="showPreformattedMessage">Preformatted text</CButton>
+          <CButton size="small" @click="showHtmlMessage">Trusted HTML</CButton>
         </div>
         <span>Last result: {{ lastResult }}</span>
       </div>
